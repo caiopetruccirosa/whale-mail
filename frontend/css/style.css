@@ -1,4 +1,4 @@
-/*-------------------------------------------------
+  /*-------------------------------------------------
 	Style file contain theme components style
 -------------------------------------------------*/
 @import url(https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,500,600);
@@ -2699,9 +2699,9 @@ body
 
 #main
 {
-    min-height: -webkit-calc(100% - 116px);
-    min-height:    -moz-calc(100% - 116px);
-    min-height:         calc(100% - 116px);
+    min-height: -webkit-calc(100% - 51px);
+    min-height:    -moz-calc(100% - 51px);
+    min-height:         calc(100% - 51px);
     padding-left: 0;
 
     -webkit-transition: .3s ease all;
@@ -2721,7 +2721,7 @@ body
 {
     position: absolute;
     z-index: -1;
-    top: 64px;
+    top: 0;
     left: 0;
 
     width: 100%;

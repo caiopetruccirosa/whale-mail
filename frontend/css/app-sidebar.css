@@ -82,9 +82,9 @@
     overflow: hidden;
 
     width: 280px; 
-    height: -webkit-calc( 100vh - 325px);
-    height:    -moz-calc( 100vh - 325px);
-    height:         calc( 100vh - 325px);
+    height: -webkit-calc( 100vh - 260px);
+    height:    -moz-calc( 100vh - 260px);
+    height:         calc( 100vh - 260px);
     margin-left: -1.4rem;
     padding-left: 1.4rem;
 }
