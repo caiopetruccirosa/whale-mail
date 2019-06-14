@@ -6,12 +6,12 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="account.Account" %>
+<%@ page import="bd.dbos.*" %>
 
 <%
-    Account acc  = (Account)session.getAttribute("acc");
+    User user = (User)session.getAttribute("user");
 
-    if (acc == null)
+    if (user == null)
         response.sendRedirect("../");
 %>
 
