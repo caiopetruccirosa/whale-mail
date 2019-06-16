@@ -11,14 +11,16 @@ public class Users
 {
 	public static boolean existe(String user) throws Exception
     {
+		if (user == null || user.trim() == "")
+			throw new Exception("Usuário nulo!");
+		
         try
         {
-
     		BDSQLServer.COMANDO.prepareStatement ("SELECT * FROM USERS WHERE USER = ?");
             BDSQLServer.COMANDO.setString(1, user);
-            MeuResultSet resultado = (MeuResultSet)BDSQLServer.COMANDO.executeQuery();
+            MeuResultSet ret = (MeuResultSet)BDSQLServer.COMANDO.executeQuery();
 
-            return resultado.first();
+            return ret.first();
         }
         catch (SQLException ex)
         {
@@ -28,14 +30,20 @@ public class Users
 	
     public static boolean existe(String user, String pw) throws Exception
     {
+    	if (user == null || user.trim() == "")
+			throw new Exception("Usuário nulo!");
+    	
+    	if (pw == null || pw.trim() == "")
+			throw new Exception("Senha nula!");
+    	
         try
         {
             BDSQLServer.COMANDO.prepareStatement ("SELECT * FROM USERS WHERE USER = ? AND PW = ?");
             BDSQLServer.COMANDO.setString(1, user);
             BDSQLServer.COMANDO.setString(2, pw);
-            MeuResultSet resultado = (MeuResultSet)BDSQLServer.COMANDO.executeQuery();
+            MeuResultSet ret = (MeuResultSet)BDSQLServer.COMANDO.executeQuery();
 
-            return resultado.first();
+            return ret.first();
         }
         catch (SQLException ex)
         {
@@ -64,15 +72,15 @@ public class Users
         }
     }
 
-    public static void excluir(User user) throws Exception
-        {
-        if (!existe(user.getUser(), user.getPassword()))
+    public static void excluir(String user, int id) throws Exception
+	{
+        if (!existe(user))
             throw new Exception ("Usuário não cadastrado!");
 
         try
         {
             BDSQLServer.COMANDO.prepareStatement("DELETE FROM USERS WHERE ID=?");
-            BDSQLServer.COMANDO.setInt(1, user.getId());
+            BDSQLServer.COMANDO.setInt(1, id);
             BDSQLServer.COMANDO.executeUpdate();
             BDSQLServer.COMANDO.commit();
         }
@@ -87,7 +95,7 @@ public class Users
         if (user == null)
             throw new Exception ("Usuário nulo!");
 
-        if (!existe(user.getUser(), user.getPassword()))
+        if (!existe(user.getUser()))
             throw new Exception ("Usuário não cadastrado!");
 
         try
@@ -109,18 +117,21 @@ public class Users
 
     public static User getUser(String username) throws Exception
     {
+    	if (username == null || username.trim() == "")
+			throw new Exception("Usuário nulo!");
+    	
         User user = null;
 
         try
         {
             BDSQLServer.COMANDO.prepareStatement ("SELECT * FROM USERS WHERE USER = ?");
             BDSQLServer.COMANDO.setString(1, username);
-            MeuResultSet resultado = (MeuResultSet)BDSQLServer.COMANDO.executeQuery ();
+            MeuResultSet ret = (MeuResultSet)BDSQLServer.COMANDO.executeQuery ();
 
-            if (!resultado.first())
+            if (!ret.first())
                 throw new Exception ("Usuário não cadastrado!");
 
-            user = new User(resultado.getInt("ID"), resultado.getString("USER"), resultado.getString("PW"));
+            user = new User(ret.getInt("ID"), ret.getString("USER"), ret.getString("PW"));
         }
         catch (SQLException ex)
         {
@@ -138,10 +149,10 @@ public class Users
         {
             BDSQLServer.COMANDO.prepareStatement("SELECT * FROM USERS");
 
-            MeuResultSet resultado = (MeuResultSet)BDSQLServer.COMANDO.executeQuery ();
+            MeuResultSet ret = (MeuResultSet)BDSQLServer.COMANDO.executeQuery ();
             
-            while (resultado.next()) {
-            	User aux = new User(resultado.getInt("ID"), resultado.getString("USER"), resultado.getString("PW"));
+            while (ret.next()) {
+            	User aux = new User(ret.getInt("ID"), ret.getString("USER"), ret.getString("PW"));
             	users.add(aux);
             }
         }

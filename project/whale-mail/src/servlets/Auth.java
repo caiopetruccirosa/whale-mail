@@ -1,6 +1,8 @@
 package servlets;
 
 import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -8,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import accountmanager.AccountManager;
 import bd.daos.Users;
 import bd.dbos.User;
 
@@ -33,18 +36,14 @@ public class Auth extends HttpServlet {
 		String user = request.getParameter("user").trim();
 		String pass = request.getParameter("pass").trim();
 		
-		HttpSession session = request.getSession();
+		HttpSession session = request.getSession();	
 		try {
-			session.setAttribute("user", new User(1, user, pass));	
-			response.sendRedirect("mail/");
-			
-			/*
-			if (Users.existe(user, pass)) {
-				session.setAttribute("user", Users.getUser(user));				
+			if (Users.existe(user, pass)) {						
+				session.setAttribute("user", new AccountManager(Users.getUser(user)));				
 				response.sendRedirect("mail/");
-			} else 
+			} else
+				
 				throw new Exception("Usuário ou senha estão incorretos!");
-			*/
 		}
 		catch (Exception ex) {
 			session.setAttribute("err", ex.getMessage());
@@ -76,7 +75,7 @@ public class Auth extends HttpServlet {
 			session.setAttribute("err", ex.getMessage());
 		}
 		
-		response.sendRedirect("/");
+		response.sendRedirect("whale-mail/");
 	}
 
 }

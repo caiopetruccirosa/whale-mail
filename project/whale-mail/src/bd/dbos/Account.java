@@ -7,9 +7,10 @@ public class Account implements Cloneable
     protected String pass;
     protected String host;
     protected String protocol;
-    protected String port;
+    protected int port;
+    protected int owner_id;
 
-    public Account(int id, String user, String pass, String host) throws Exception
+    public Account(int id, String user, String pass, String host, String protocol, int port, int owner_id) throws Exception
     {
         if (user == null || user.trim() == "")
             throw new Exception("Usuário inválido!");
@@ -19,11 +20,17 @@ public class Account implements Cloneable
 
         if (host == null || host.trim() == "")
             throw new Exception("Host inválido!");
+        
+        if (protocol == null || protocol.trim() == "")
+            throw new Exception("Protocolo inválido!");
 
         this.id = id;
         this.user = user;
         this.pass = pass;
         this.host = host;
+        this.protocol = protocol;
+        this.port = port;
+        this.owner_id = owner_id;
     }
 
     public int getId()
@@ -44,6 +51,21 @@ public class Account implements Cloneable
     public String getHost()
     {
         return this.host;
+    }
+    
+    public String getProtocol()
+    {
+        return this.protocol;
+    }
+    
+    public int getPort()
+    {
+        return this.port;
+    }
+    
+    public int getOwnerId()
+    {
+        return this.owner_id;
     }
 
     public void setUser(String u) throws Exception
@@ -69,10 +91,23 @@ public class Account implements Cloneable
 
         this.host = h;
     }
+    
+    public void setProtocol(String p) throws Exception
+    {
+        if (p == null || p.trim() == "")
+            throw new Exception("Protocolo inválido!");
+
+        this.protocol = p;
+    }
+    
+    public void setPort(int p)
+    {
+        this.port = p;
+    }
 
     public String toString()
     {
-        return "{" + this.id + ":" + this.user + ":" + this.pass + ":" + this.host + "}";
+        return "{" + this.id + ":" + this.user + ":" + this.pass + ":" + this.host + ":" + this.protocol + ":" + this.port + ":" + this.owner_id + "}";
     }
 
     public boolean equals(Object obj)
@@ -100,6 +135,15 @@ public class Account implements Cloneable
         if (!this.host.equals(m.host))
             return false;
         
+        if (!this.protocol.equals(m.protocol))
+            return false;
+        
+        if (this.port != m.port)
+        	return false;
+        
+        if (this.owner_id != m.owner_id)
+        	return false;
+        
         return true;
     }
 
@@ -111,6 +155,9 @@ public class Account implements Cloneable
         ret += this.user.hashCode() * 7;
         ret += this.pass.hashCode() * 7;
         ret += this.host.hashCode() * 7;
+        ret += this.protocol.hashCode() * 7;
+        ret += new Integer(this.port).hashCode() * 7;
+        ret += new Integer(this.owner_id).hashCode() * 7;
 
         return ret;
     }
@@ -137,5 +184,8 @@ public class Account implements Cloneable
         this.user = m.user;
         this.pass = m.pass;
         this.host = m.host;
+        this.protocol = m.protocol;
+        this.port = m.port;
+        this.owner_id = m.owner_id;
     }
 }

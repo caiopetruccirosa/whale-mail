@@ -92,11 +92,21 @@
 						$('.main').removeClass('animated bounceInDown')
 					});
 				});
+				
+				var err = '<%= session.getAttribute("err") %>';
+				
+				<% session.removeAttribute("err"); %>
+				
+				if (err != 'null') {
+					alert(err);
+					Materialize.toast({html: err});
+				}
 			});
 
 			$('.login').click(function () {
 				changeForm('login');
 			});
+			
 			$('.cadastro').click(function () {
 				changeForm('cadastro');
 			});

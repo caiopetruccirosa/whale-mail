@@ -12,11 +12,11 @@ public class Accounts {
     {
         try
         {
-            BDSQLServer.COMANDO.prepareStatement ("SELECT * FROM ACCOUNTS WHERE ID = ?");
+            BDSQLServer.COMANDO.prepareStatement ("SELECT * FROM ACCOUNTS WHERE [ID] = ?");
             BDSQLServer.COMANDO.setInt(1, id);
-            MeuResultSet resultado = (MeuResultSet)BDSQLServer.COMANDO.executeQuery();
+            MeuResultSet ret = (MeuResultSet)BDSQLServer.COMANDO.executeQuery();
 
-            return resultado.first();
+            return ret.first();
         }
         catch (SQLException ex)
         {
@@ -31,11 +31,14 @@ public class Accounts {
 
         try
         {
-            BDSQLServer.COMANDO.prepareStatement("INSERT INTO ACCOUNT(USER, PW, HOST) VALUES (?, ?, ?)");
+            BDSQLServer.COMANDO.prepareStatement("INSERT INTO ACCOUNT([USER], [PW], [HOST], [PROTOCOL], [PORT], [OWNER_ID]) VALUES (?, ?, ?, ?, ?, ?)");
 
             BDSQLServer.COMANDO.setString(1, acc.getUser());
             BDSQLServer.COMANDO.setString(2, acc.getPassword());
             BDSQLServer.COMANDO.setString(3, acc.getHost());
+            BDSQLServer.COMANDO.setString(4, acc.getProtocol());
+            BDSQLServer.COMANDO.setInt(5, acc.getPort());
+            BDSQLServer.COMANDO.setInt(5, acc.getOwnerId()());
 
             BDSQLServer.COMANDO.executeUpdate();
             BDSQLServer.COMANDO.commit();
@@ -46,15 +49,15 @@ public class Accounts {
         }
     }
 
-    public static void excluir(Account acc) throws Exception
+    public static void excluir(int id) throws Exception
     {
-        if (!existe(acc.getId()))
+        if (!existe(id))
             throw new Exception ("Conta não cadastrada!");
 
         try
         {
-            BDSQLServer.COMANDO.prepareStatement("DELETE FROM ACCOUNTS WHERE ID=?");
-            BDSQLServer.COMANDO.setInt(1, acc.getId());
+            BDSQLServer.COMANDO.prepareStatement("DELETE FROM ACCOUNTS WHERE [ID]=?");
+            BDSQLServer.COMANDO.setInt(1, id);
             BDSQLServer.COMANDO.executeUpdate();
             BDSQLServer.COMANDO.commit();
         }
@@ -74,12 +77,15 @@ public class Accounts {
 
         try
         {
-            BDSQLServer.COMANDO.prepareStatement ("UPDATE ACCOUNT SET USER=?, PW=?, HOST=? WHERE ID = ?");
+            BDSQLServer.COMANDO.prepareStatement ("UPDATE ACCOUNT SET [USER] = ?, [PW] = ?, [HOST] = ?, [PROTOCOL] = ?, [PORT] = ?, [OWNER_ID] = ? WHERE ID = ?");
 
             BDSQLServer.COMANDO.setString(1, acc.getUser());
             BDSQLServer.COMANDO.setString(2, acc.getPassword());
             BDSQLServer.COMANDO.setString(3, acc.getHost());
-            BDSQLServer.COMANDO.setInt(4, acc.getId());
+            BDSQLServer.COMANDO.setInt(4, acc.getProtocol()());
+            BDSQLServer.COMANDO.setInt(5, acc.getPort()());
+            BDSQLServer.COMANDO.setInt(6, acc.getOwnerId()());
+            BDSQLServer.COMANDO.setInt(7, acc.getId());
 
             BDSQLServer.COMANDO.executeUpdate();
             BDSQLServer.COMANDO.commit();
@@ -96,14 +102,14 @@ public class Accounts {
 
         try
         {
-            BDSQLServer.COMANDO.prepareStatement ("SELECT * FROM ACCOUNTS WHERE ID = ?");
+            BDSQLServer.COMANDO.prepareStatement ("SELECT * FROM ACCOUNTS WHERE [ID] = ?");
             BDSQLServer.COMANDO.setInt(1, id);
-            MeuResultSet resultado = (MeuResultSet)BDSQLServer.COMANDO.executeQuery ();
+            MeuResultSet ret = (MeuResultSet)BDSQLServer.COMANDO.executeQuery ();
 
-            if (!resultado.first())
+            if (!ret.first())
                 throw new Exception ("Conta não cadastrada!");
 
-            acc = new Account(resultado.getInt("ID"), resultado.getString("USER"), resultado.getString("PW"), resultado.getString("HOST"));
+            acc = new Account(ret.getInt("ID"), ret.getString("USER"), ret.getString("PW"), ret.getString("HOST"), ret.getString("PROTOCOL"), ret.getInt("PORT"), ret.getInt("OWNER_ID"));
         }
         catch (SQLException ex)
         {
@@ -113,18 +119,19 @@ public class Accounts {
         return acc;
     }
 
-    public static ArrayList<Account> getAccounts() throws Exception
+    public static ArrayList<Account> getAccounts(int ownerId) throws Exception
     {
         ArrayList<Account> accs = new ArrayList<>();
 
         try
         {
-            BDSQLServer.COMANDO.prepareStatement("SELECT * FROM ACCOUNTS");
+            BDSQLServer.COMANDO.prepareStatement("SELECT * FROM ACCOUNTS WHERE [OWNER_ID] = ?");
 
-            MeuResultSet resultado = (MeuResultSet)BDSQLServer.COMANDO.executeQuery ();
+            MeuResultSet ret = (MeuResultSet)BDSQLServer.COMANDO.executeQuery ();
+            BDSQLServer.COMANDO.setInt(1, ownerId);
             
-            while (resultado.next()) {
-            	Account aux = new Account(resultado.getInt("ID"), resultado.getString("USER"), resultado.getString("PW"), resultado.getString("HOST"));
+            while (ret.next()) {
+            	Account aux = new Account(ret.getInt("ID"), ret.getString("USER"), ret.getString("PW"), ret.getString("HOST"), ret.getString("PROTOCOL"), ret.getInt("PORT"), ret.getInt("OWNER_ID"));
             	accs.add(aux);
             }
         }
