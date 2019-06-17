@@ -1,9 +1,12 @@
 package servlets;
 
 import java.io.*;
+import java.util.Base64;
+
 import javax.servlet.*;
 import javax.servlet.annotation.*;
 import javax.servlet.http.*;
+
 import accountmanager.AccountManager;
 import bd.daos.Users;
 import bd.dbos.User;
@@ -65,7 +68,8 @@ public class Authentication extends HttpServlet {
 			if (Users.existe(user))
 				throw new Exception("Usuário já existente!");
 			
-			Users.cadastrar(new User(0, user, pass));
+			String senhaCriptografada = Base64.getEncoder().encodeToString(pass.getBytes());
+			Users.cadastrar(new User(0, user, senhaCriptografada));
 			
 			session.setAttribute("success", "Usuário cadastrado com sucesso!");
 		}
