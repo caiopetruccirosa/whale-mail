@@ -60,6 +60,22 @@ public class AccountManager
         	this.setCurrent(-1);
     }
     
+    public void updateAccount(Account a) throws Exception {
+    	if (a == null)
+            throw new Exception("Conta nula!");
+    	
+    	Accounts.alterar(a);
+        this.accounts.forEach(acc -> {
+	    	if (acc.getId() == a.getId())
+	    		acc = a;
+    	});
+        
+        if (this.accounts.size() > 0)
+        	this.setCurrent(0);
+        else
+        	this.setCurrent(-1);
+    }
+    
     public void deleteAccount(int id) throws Exception
     {
         Accounts.excluir(id);

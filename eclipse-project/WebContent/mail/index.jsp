@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" 
 	language="java" 
-	import="accountmanager.*, bd.dbos.*, javax.mail.*, java.util.*" %>
+	import="accountmanager.*, bd.dbos.*, javax.mail.*, java.util.*, mail.*" %>
 
 <%
 	AccountManager acc = (AccountManager)session.getAttribute("user");
@@ -84,7 +84,11 @@
                       </div>
                     </div>
                   </div>
-
+				  <div style="top: 54px; right: 19px;" class="fixed-action-btn direction-top">
+              		<a class="btn-floating btn-large primary-text gradient-shadow modal-trigger" >
+                		<i class="material-icons">add</i>
+              		</a>
+		            </div>
                   <div id="sidebar-list" class="sidebar-menu list-group position-relative animate fadeLeft ps ps--active-y">
                     <div class="sidebar-list-padding app-sidebar" id="email-sidenav">
                       <ul class="email-list display-grid">
@@ -166,37 +170,51 @@
                         </div>
                       </div>
 
-                      <div class="collection email-collection ps ps--active-y" style="max-height: 410px;">
-                        <a href='#' class='collection-item animate fadeUp delay-2'>
-                          <div class="list-content">
-                            <div class="list-title-area">
-                              <div class="user-media">
-                                <div class="list-title">Pari Kalin</div>
-                              </div>
-
-                              <div class="title-right">
-                                <span class="attach-file">
-                                  <i class="material-icons">attach_file</i>
-                                </span>
-                              </div>
-                            </div>
-                            <div class="list-desc">
-                              There are many variations of passages of Lorem Ipsum available, but the majority
-                              have suffered alteration in some form, by injected humour, or randomised words which don't look even
-                              slightly believable. If you are going to use a passage of Lorem Ipsum
-                            </div>
-                          </div>
-                          <div class="list-right">
-                            <div class="list-date"> 12:47 PM </div>
-                          </div>
-                        </a>
-                        <div class="ps__rail-x" style="left: 0px; bottom: -1797px;">
-                          <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
-                        </div>
-                        <div class="ps__rail-y" style="top: 1797px; height: 410px; right: 0px;">
-                          <div class="ps__thumb-y" tabindex="0" style="top: 334px; height: 76px;"></div>
-                        </div>
-                      </div>
+                      <%
+                        //Listagem de email
+                       
+                        try {
+                          Mail[][] mails = acc.getCurrentMessages();
+                          
+                          out.println("<div class='collection email-collection ps ps--active-y' style='max-height: 410px;'>");
+                          for (int i = 0; i < mails.length; i++) {
+                            for (int j = 0; j < mails[i].length; j++) {
+                              out.println("<a href='#' class='collection-item animate fadeUp delay-2'>");
+                              out.println("<div class='list-content'>");
+                              out.println("<div class='list-title-area'>");
+                              out.println("<div class='user-media'>");
+                              out.println("<div class='list-title'>"+ mails[i][j].getFrom() + "</div>");
+                              out.println("</div>");
+                              out.println("<div class='title-right'>");
+                              out.println("<span class='attach-file'>");
+                              out.println("<i class='material-icons'>attach_file</i>");
+                              out.println(" </span>");
+                              out.println(" </div>");
+                              out.println("</div>");
+                              out.println("<div class='list-desc'>");
+                              out.println(mails[i][j].getSubject());
+                              out.println("</div>");
+                              out.println("</div>");
+                              out.println("<div class='list-right'>");
+                              out.println("<div class='list-date'> 12:47 PM </div>");
+                              out.println(" </div>");
+                              out.println("</a>");
+                            }
+                          }
+                          
+                          out.println("<div class='ps__rail-x' style='left: 0px; bottom: -1797px;'>");
+                          out.println("<div class='ps__thumb-x' tabindex='0' style='left: 0px; width: 0px;'></div>");
+                          out.println("</div>");
+                          out.println("<div class='ps__rail-y' style='top: 1797px; height: 410px; right: 0px;'>");
+                          out.println("<div class='ps__thumb-y' tabindex='0' style='top: 334px; height: 76px;'></div>");
+                          out.println("</div>");
+                          out.println("</div>");
+                        } catch (Exception ex) {
+                          out.println("<h1>");
+                          out.println(ex.getMessage());
+                          out.println("</h1>");
+                        }
+                      %>
                     </div>
                   </div>
                 </div>

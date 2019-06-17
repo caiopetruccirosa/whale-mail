@@ -10,10 +10,10 @@ public class Mail implements Cloneable {
     protected String[] cc;
     protected String[] bcc;
     protected Date date;
-    protected MimeMessage message;
+    protected Object message;
     protected ArrayList<Attachment> attachments;
 
-    public Mail(String from, String to, String[] cc, String[] bcc, String subject, MimeMessage message, Date date) throws Exception {
+    public Mail(String from, String to, String[] cc, String[] bcc, String subject, Object message, Date date) throws Exception {
     	if (from == null || from.trim() == "")
     		throw new Exception("Remetente nulo!");
     	
@@ -78,7 +78,7 @@ public class Mail implements Cloneable {
     	return this.subject;
     }
     
-    public MimeMessage getMessage() {
+    public Object getMessage() {
     	return this.message;
     }
     
@@ -205,7 +205,7 @@ public class Mail implements Cloneable {
     	}
     	
     	this.subject = m.subject;
-    	this.message = new MimeMessage(m.message);
+    	this.message = m.message;
     	
     	this.attachments = new ArrayList<>(m.attachments);
     	

@@ -3,6 +3,7 @@ package handlers;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import bd.dbos.*;
 import mail.*;
@@ -92,27 +93,29 @@ public class FolderHandler
     
     public Mail[] getMails(String folderName) throws Exception
     {
-        Folder folder = this.store.getFolder(folderName);
+    	if (folderName.equals(""))
+    		folderName = "INBOX";
+    	
+    	Folder folder = this.store.getFolder(folderName);
+    	folder.open(Folder.READ_ONLY);
 
-        if (!folder.isOpen())
-        	folder.open(Folder.READ_ONLY);
-        
-        Message[] messages = folder.getMessages();
+        Message[] messages = folder.getMessages(0, 50);
         Mail[] mails = new Mail[messages.length];
         
-        for (int i = 0; i < messages.length; i++) {
+        int limit = messages.length;
+        if (limit > 50)
+        	limit = 50;
+        
+        for (int i = 0; i < limit; i++) {
         	InternetAddress addressFrom = (InternetAddress) messages[i].getFrom()[0];
         	String from = addressFrom.getPersonal();
         	
-        	InternetAddress addressReplyTo = (InternetAddress) messages[i].getReplyTo()[0];
-        	String replyTo = addressReplyTo.getPersonal();
-        	
-        	MimeMessage msg = (MimeMessage) messages[i].getContent();
+        	Object msg = messages[i].getContent();
         	Date date = messages[i].getSentDate();
         	
         	String subject = messages[i].getSubject();
         	
-        	Mail aux = new Mail(from, replyTo, null, null, subject, msg, date);
+        	Mail aux = new Mail(from, this.acc.getUser(), null, null, subject, msg, date);
         	
         	mails[i] = aux;
         }
@@ -120,9 +123,16 @@ public class FolderHandler
         return mails;
     }
     
-    public void moveMail() throws Exception {}
+    public void moveMail() throws Exception {
+    	
+    }
     
-    public void deleteMail() throws Exception {}
+    public void deleteMail() throws Exception {
+    	
+    }
     
-    public void moveFolder() throws Exception {}
+    
+    public void moveFolder(String origin, String dest) throws Exception {
+    	
+    }
 }
