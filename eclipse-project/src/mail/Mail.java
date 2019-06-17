@@ -1,6 +1,7 @@
 package mail;
 
 import java.util.*;
+import javax.mail.internet.*;
 
 public class Mail implements Cloneable {
 	protected String from;
@@ -8,10 +9,11 @@ public class Mail implements Cloneable {
     protected String subject;
     protected String[] cc;
     protected String[] bcc;
-    protected String message;
+    protected Date date;
+    protected MimeMessage message;
     protected ArrayList<Attachment> attachments;
 
-    public Mail(String from, String to, String[] cc, String[] bcc, String subject, String message) throws Exception {
+    public Mail(String from, String to, String[] cc, String[] bcc, String subject, MimeMessage message, Date date) throws Exception {
     	if (from == null || from.trim() == "")
     		throw new Exception("Remetente nulo!");
     	
@@ -21,22 +23,39 @@ public class Mail implements Cloneable {
     	if (subject == null || subject.trim() == "")
     		throw new Exception("Assunto nulo!");
     	
-    	if (message == null || message.trim() == "")
+    	if (message == null)
     		throw new Exception("Mensagem nula!");
     	
     	this.from = from;
     	this.to = to;
-    	this.cc = new String[cc.length];
     	
-    	for (int i = 0; i < cc.length; i++)
-    		this.cc[i] = cc[i];
+    	if (cc != null) {
+			this.cc = new String[cc.length];
+    		
+    		for (int i = 0; i < cc.length; i++)
+    			this.cc[i] = cc[i];
+    	}
+    	else
+    		this.cc = null;
     	
-    	this.bcc = new String[bcc.length];
-    	for (int i = 0; i < bcc.length; i++)
-    		this.bcc[i] = bcc[i];
+    	if (bcc != null) {
+			this.bcc = new String[bcc.length];
+	    	
+	    	for (int i = 0; i < bcc.length; i++)
+	    		this.bcc[i] = bcc[i];
+    	}
+    	else
+    		this.bcc = null;
     	
     	this.subject = subject;
     	this.message = message;
+    	this.date = date;
+    	
+    	this.attachments = new ArrayList<Attachment>();
+    }
+    
+    public Date getDate() {
+    	return this.date;
     }
     
     public String getFrom() {
@@ -59,7 +78,7 @@ public class Mail implements Cloneable {
     	return this.subject;
     }
     
-    public String getMessage() {
+    public MimeMessage getMessage() {
     	return this.message;
     }
     
@@ -82,11 +101,13 @@ public class Mail implements Cloneable {
     	ret += this.subject.hashCode()*7;
     	ret += this.message.hashCode()*7;
     	
-    	for (int i = 0; i < this.cc.length; i++)
-    		ret += this.cc[i].hashCode()*7;
+    	if (this.cc != null)
+	    	for (int i = 0; i < this.cc.length; i++)
+	    		ret += this.cc[i].hashCode()*7;
     	
-    	for (int i = 0; i < this.bcc.length; i++)
-    		ret += this.bcc[i].hashCode()*7;
+    	if (this.bcc != null)
+	    	for (int i = 0; i < this.bcc.length; i++)
+	    		ret += this.bcc[i].hashCode()*7;
     	
     	return ret;
     }
@@ -116,22 +137,33 @@ public class Mail implements Cloneable {
         if (!this.subject.equals(m.subject))
         	return false;
         
-        if (!this.message.equals(m.message))
+        if (this.message != null && m.message != null)
+        	if (!this.message.equals(m.message))
+            	return false;
+        else
         	return false;
         
-        if (this.cc.length != m.cc.length)
+        if (this.cc != null && m.cc != null) {
+        	if (this.cc.length != m.cc.length)
+            	return false;
+            
+            for (int i = 0; i < this.cc.length; i++)
+            	if (!this.cc[i].equals(m.cc[i]))
+            		return false;
+        }
+        else
         	return false;
         
-        for (int i = 0; i < this.cc.length; i++)
-        	if (!this.cc[i].equals(m.cc[i]))
-        		return false;
-        
-        if (this.bcc.length != m.bcc.length)
+        if (this.cc != null && m.cc != null) {
+	        if (this.bcc.length != m.bcc.length)
+	        	return false;
+	        
+	        for (int i = 0; i < this.bcc.length; i++)
+	        	if (!this.bcc[i].equals(m.bcc[i]))
+	        		return false;
+        }
+        else
         	return false;
-        
-        for (int i = 0; i < this.bcc.length; i++)
-        	if (!this.bcc[i].equals(m.bcc[i]))
-        		return false;
         
         return true;
     }
@@ -156,15 +188,27 @@ public class Mail implements Cloneable {
     	this.from = m.from;
     	this.to = m.to;
     	
-    	this.cc = new String[m.cc.length];
-    	for (int i = 0; i < m.cc.length; i++)
-    		this.cc[i] = m.cc[i];
+    	if (m.cc != null)
+    		this.cc = null;
+    	else {
+    		this.cc = new String[m.cc.length];
+        	for (int i = 0; i < m.cc.length; i++)
+        		this.cc[i] = m.cc[i];
+    	}
     	
-    	this.bcc = new String[m.bcc.length];
-    	for (int i = 0; i < m.bcc.length; i++)
-    		this.bcc[i] = m.bcc[i];
+    	if (m.bcc != null)
+    		this.bcc = null;
+    	else {
+    		this.bcc = new String[m.bcc.length];
+        	for (int i = 0; i < m.bcc.length; i++)
+        		this.bcc[i] = m.bcc[i];
+    	}
     	
     	this.subject = m.subject;
-    	this.message = m.message;    	
+    	this.message = new MimeMessage(m.message);
+    	
+    	this.attachments = new ArrayList<>(m.attachments);
+    	
+    	this.date = (Date) m.date.clone();
     }
 }

@@ -18,7 +18,7 @@ public class Users
 		
         try
         {
-    		bd.getCmd().prepareStatement ("SELECT * FROM USERS WHERE USER = ?");
+    		bd.getCmd().prepareStatement ("SELECT * FROM [USERS] WHERE [USER] = ?");
             bd.getCmd().setString(1, user);
             MeuResultSet ret = (MeuResultSet)bd.getCmd().executeQuery();
 
@@ -47,7 +47,7 @@ public class Users
     	
         try
         {
-            bd.getCmd().prepareStatement ("SELECT * FROM USERS WHERE USER = ? AND PW = ?");
+            bd.getCmd().prepareStatement ("SELECT * FROM [USERS] WHERE [USER] = ? AND [PW] = ?");
             bd.getCmd().setString(1, user);
             bd.getCmd().setString(2, pw);
             MeuResultSet ret = (MeuResultSet)bd.getCmd().executeQuery();
@@ -74,7 +74,7 @@ public class Users
         
         try
         {
-            bd.getCmd().prepareStatement("INSERT INTO USERS(USER, PW) VALUES (?, ?)");
+            bd.getCmd().prepareStatement("INSERT INTO [USERS]([USER], [PW]) VALUES (?, ?)");
 
             bd.getCmd().setString(1, user.getUser());
             bd.getCmd().setString(2, user.getPassword());
@@ -102,7 +102,7 @@ public class Users
         
         try
         {
-            bd.getCmd().prepareStatement("DELETE FROM USERS WHERE ID=?");
+            bd.getCmd().prepareStatement("DELETE FROM [USERS] WHERE [ID]=?");
             bd.getCmd().setInt(1, id);
             bd.getCmd().executeUpdate();
             bd.getCmd().commit();
@@ -130,7 +130,7 @@ public class Users
         
         try
         {
-            bd.getCmd().prepareStatement ("UPDATE USERS SET USER=?, PW=? WHERE ID = ?");
+            bd.getCmd().prepareStatement ("UPDATE [USERS] SET [USER]=?, [PW]=? WHERE [ID] = ?");
 
             bd.getCmd().setString(1, user.getUser());
             bd.getCmd().setString(2, user.getPassword());
@@ -161,7 +161,7 @@ public class Users
         
         try
         {
-            bd.getCmd().prepareStatement ("SELECT * FROM USERS WHERE USER = ?");
+            bd.getCmd().prepareStatement ("SELECT * FROM [USERS] WHERE [USER] = ?");
             bd.getCmd().setString(1, username);
             MeuResultSet ret = (MeuResultSet)bd.getCmd().executeQuery ();
 
@@ -191,7 +191,7 @@ public class Users
         
         try
         {
-            bd.getCmd().prepareStatement("SELECT * FROM USERS");
+            bd.getCmd().prepareStatement("SELECT * FROM [USERS]");
 
             MeuResultSet ret = (MeuResultSet)bd.getCmd().executeQuery ();
             

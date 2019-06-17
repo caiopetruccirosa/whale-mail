@@ -1,7 +1,12 @@
 package handlers;
 
 import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import bd.dbos.*;
+import mail.*;
+
 import java.util.*;
 
 public class FolderHandler
@@ -27,7 +32,7 @@ public class FolderHandler
         this.store = this.session.getStore("imaps");
         this.store.connect("imap.gmail.com", acc.getUser(), acc.getPassword());
         
-        this.current = "INBOX";
+        this.current = "";
     }
 
     public void renameFolder(String name, String newName)  throws Exception
@@ -69,32 +74,50 @@ public class FolderHandler
     	if (c == null || c.trim() == "")
     		throw new Exception("Pasta inválida!");
     	
-    	// PODERIA HAVER UMA CHECAGEM SE A PASTA REALMENTE EXISTE, PORÉM JÁ TEM MUITA COISA PRA FAZER
+        if (!this.store.getFolder(c).exists())
+            throw new FolderNotFoundException();
     	
     	this.current = c;
     }
 
-    public Folder[] getFolders() throws Exception
+    public Folder[] getCurrentFolders() throws Exception
     {
-        return this.store.getDefaultFolder().list("*");
+        return this.store.getFolder(this.current).list("*");
     }
 
-    public Message[] getCurrentMails() throws Exception
+    public Mail[] getCurrentMails() throws Exception
     {
     	return this.getMails(this.current);
     }
     
-    public Message[] getMails(String folderName) throws Exception
+    public Mail[] getMails(String folderName) throws Exception
     {
         Folder folder = this.store.getFolder(folderName);
 
-        try {
-            folder.open(Folder.READ_ONLY);
-
-            return folder.getMessages();
-        } finally {
-            folder.close(false);
+        if (!folder.isOpen())
+        	folder.open(Folder.READ_ONLY);
+        
+        Message[] messages = folder.getMessages();
+        Mail[] mails = new Mail[messages.length];
+        
+        for (int i = 0; i < messages.length; i++) {
+        	InternetAddress addressFrom = (InternetAddress) messages[i].getFrom()[0];
+        	String from = addressFrom.getPersonal();
+        	
+        	InternetAddress addressReplyTo = (InternetAddress) messages[i].getReplyTo()[0];
+        	String replyTo = addressReplyTo.getPersonal();
+        	
+        	MimeMessage msg = (MimeMessage) messages[i].getContent();
+        	Date date = messages[i].getSentDate();
+        	
+        	String subject = messages[i].getSubject();
+        	
+        	Mail aux = new Mail(from, replyTo, null, null, subject, msg, date);
+        	
+        	mails[i] = aux;
         }
+        
+        return mails;
     }
     
     public void moveMail() throws Exception {}

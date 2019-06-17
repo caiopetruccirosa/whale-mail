@@ -5,6 +5,7 @@ import bd.dbos.*;
 import java.util.*;
 import javax.mail.*;
 import handlers.*;
+import mail.*;
 
 public class AccountManager
 {
@@ -18,16 +19,23 @@ public class AccountManager
     {
     	this.user = user;
     	
-        //this.accounts = Accounts.getAccounts(user.getId());
+        this.accounts = Accounts.getAccounts(user.getId());
         
     	// pra teste, porque o BD não ta funfando em casa
-    	this.accounts = new ArrayList<Account>();
-    	this.accounts.add(new Account(1, "littleheadfilms@gmail.com", "EmailLH12", "smtp.gmail.com", "IMAP", 587, 1));
+    	//this.accounts = new ArrayList<Account>();
+    	//this.accounts.add(new Account(1, "littleheadfilms@gmail.com", "EmailLH12", "smtp.gmail.com", "IMAP", 587, 1));
     	
         if (this.accounts.size() > 0)
         	this.setCurrent(0);
         else
         	this.setCurrent(-1);
+    }
+    
+    public Account getCurrentAccount() throws Exception {
+    	if (this.current < 0)
+    		throw new Exception("Usuário não possui contas!");
+    	
+    	return this.accounts.get(this.current);
     }
     
     public User getUser() {
@@ -81,36 +89,55 @@ public class AccountManager
     	}
     }
     
-    public ArrayList<Message> getCurrentMessages() throws Exception {
+    public Mail[][] getCurrentMessages() throws Exception {
     	if (this.current < 0)
     		throw new Exception("Não foi possível listar as mensagens do e-mail atual!");
     	
-    	ArrayList<Message> ret = new ArrayList<>();
+    	Mail[][] ret = new Mail[this.accounts.size()][];
     	
+    	Mail[] aux = null;
     	if (this.current == this.accounts.size()) {
-    		// implementar pegar todos os emails de todos as contas
+    		for (int i = 0; i < ret.length; i++) {
+        		this.folders = new FolderHandler(this.accounts.get(i));
+        		aux = this.folders.getCurrentMails();
+        		ret[i] = new Mail[aux.length];
+        		ret[i] = aux;
+        	}
     		
     		this.folders = null;
     		this.mailer = null;
-    	} else
-    		ret.addAll(Arrays.asList(this.folders.getCurrentMails()));
+    	} else {
+    		aux = this.folders.getCurrentMails();
+    		ret[0] = new Mail[aux.length];
+    		ret[0] = aux;
+    	}
     	
     	return ret;
     }
     
-    public ArrayList<Folder> getCurrentFolders() throws Exception {
+    public Folder[][] getCurrentFolders() throws Exception {
     	if (this.current < 0)
     		throw new Exception("Não foi possível listar as pastas do e-mail atual!");
     	
-    	ArrayList<Folder> ret = new ArrayList<>();
+    	Folder[][] ret = new Folder[this.accounts.size()][];
     	
+    	Folder[] aux = null;
     	if (this.current == this.accounts.size()) {
-    		// implementar pegar todas as pastas de todos as contas
+    		for (int i = 0; i < ret.length; i++) {
+        		this.folders = new FolderHandler(this.accounts.get(i));
+        		
+        		aux = this.folders.getCurrentFolders();
+        		ret[i] = new Folder[aux.length];
+        		ret[i] = aux;
+        	}
     		
     		this.folders = null;
     		this.mailer = null;
-    	} else
-    		ret.addAll(Arrays.asList(this.folders.getFolders()));
+    	} else {
+    		aux = this.folders.getCurrentFolders();
+    		ret[0] = new Folder[aux.length];
+    		ret[0] = aux;
+    	}
     	
     	return ret;
     }

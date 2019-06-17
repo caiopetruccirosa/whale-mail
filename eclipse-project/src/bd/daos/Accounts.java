@@ -14,7 +14,7 @@ public class Accounts {
     	
         try
         {        	
-            bd.getCmd().prepareStatement("SELECT * FROM ACCOUNTS WHERE [ID] = ?");
+            bd.getCmd().prepareStatement("SELECT * FROM [ACCOUNTS] WHERE [ID] = ?");
             bd.getCmd().setInt(1, id);
             MeuResultSet ret = (MeuResultSet)bd.getCmd().executeQuery();
 
@@ -40,7 +40,7 @@ public class Accounts {
         
         try
         {
-            bd.getCmd().prepareStatement("INSERT INTO ACCOUNT([USER], [PW], [HOST], [PROTOCOL], [PORT], [OWNER_ID]) VALUES (?, ?, ?, ?, ?, ?)");
+            bd.getCmd().prepareStatement("INSERT INTO [ACCOUNT]([USER], [PW], [HOST], [PROTOCOL], [PORT], [OWNER_ID]) VALUES (?, ?, ?, ?, ?, ?)");
 
             bd.getCmd().setString(1, acc.getUser());
             bd.getCmd().setString(2, acc.getPassword());
@@ -72,7 +72,7 @@ public class Accounts {
         
         try
         {
-            bd.getCmd().prepareStatement("DELETE FROM ACCOUNTS WHERE [ID]=?");
+            bd.getCmd().prepareStatement("DELETE FROM [ACCOUNTS] WHERE [ID]=?");
             bd.getCmd().setInt(1, id);
             bd.getCmd().executeUpdate();
             bd.getCmd().commit();
@@ -100,7 +100,7 @@ public class Accounts {
         
         try
         {
-            bd.getCmd().prepareStatement ("UPDATE ACCOUNT SET [USER] = ?, [PW] = ?, [HOST] = ?, [PROTOCOL] = ?, [PORT] = ?, [OWNER_ID] = ? WHERE ID = ?");
+            bd.getCmd().prepareStatement ("UPDATE [ACCOUNT] SET [USER] = ?, [PW] = ?, [HOST] = ?, [PROTOCOL] = ?, [PORT] = ?, [OWNER_ID] = ? WHERE [ID] = ?");
 
             bd.getCmd().setString(1, acc.getUser());
             bd.getCmd().setString(2, acc.getPassword());
@@ -132,8 +132,9 @@ public class Accounts {
         
         try
         {
-            bd.getCmd().prepareStatement ("SELECT * FROM ACCOUNTS WHERE [ID] = ?");
+            bd.getCmd().prepareStatement ("SELECT * FROM [ACCOUNTS] WHERE [ID] = ?");
             bd.getCmd().setInt(1, id);
+            
             MeuResultSet ret = (MeuResultSet)bd.getCmd().executeQuery ();
 
             if (!ret.first())
@@ -162,10 +163,10 @@ public class Accounts {
         
         try
         {
-            bd.getCmd().prepareStatement("SELECT * FROM ACCOUNTS WHERE [OWNER_ID] = ?");
-
-            MeuResultSet ret = (MeuResultSet)bd.getCmd().executeQuery ();
+            bd.getCmd().prepareStatement("SELECT * FROM [ACCOUNTS] WHERE [OWNER_ID] = ?");
             bd.getCmd().setInt(1, ownerId);
+            
+            MeuResultSet ret = (MeuResultSet)bd.getCmd().executeQuery();
             
             while (ret.next()) {
             	Account aux = new Account(ret.getInt("ID"), ret.getString("USER"), ret.getString("PW"), ret.getString("HOST"), ret.getString("PROTOCOL"), ret.getInt("PORT"), ret.getInt("OWNER_ID"));

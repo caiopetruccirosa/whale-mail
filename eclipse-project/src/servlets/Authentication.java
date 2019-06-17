@@ -31,17 +31,17 @@ public class Authentication extends HttpServlet {
 		
 		HttpSession session = request.getSession();	
 		try {
+			/*
 			session.setAttribute("user", new AccountManager(new User(1, user, pass)));				
 			response.sendRedirect("/whalemail/mail/");
+			*/
 			
-			/*
 			if (Users.existe(user, pass)) {
 				session.setAttribute("user", new AccountManager(Users.getUser(user)));				
-				response.sendRedirect("/mail/");
+				response.sendRedirect("/whalemail/mail/");
 			} else {
 				throw new Exception("Usuário ou senha estão incorretos!");
 			}
-			*/
 		}
 		catch (Exception ex) {
 			session.setAttribute("err", ex.getMessage());
