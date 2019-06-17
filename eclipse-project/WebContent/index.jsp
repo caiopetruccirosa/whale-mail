@@ -100,6 +100,7 @@
 					if (err != null)
 						out.println("M.toast({html: '" + err + "'})");
 					
+					
 					if (success != null)
 						out.println("M.toast({html: '" + success + "'})");
 				%>
