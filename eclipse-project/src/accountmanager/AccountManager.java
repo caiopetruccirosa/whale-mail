@@ -157,16 +157,38 @@ public class AccountManager
     	
     	return ret;
     }
+        
+    public void deleteFolder(String folderName) throws Exception {
+    	if (folderName == null)
+    		throw new Exception("Nome de pasta inválido!");
+    	
+    	if (this.folders != null)
+    		this.folders.deleteFolder(folderName);
+    }
+    
+    public void renameFolder(String name, String newName) throws Exception {
+    	if (name == null)
+    		throw new Exception("Nome de pasta inválido!");
+    	
+    	if (newName == null)
+    		throw new Exception("Novo nome de pasta inválido!");
+    	
+    	if (this.folders != null)
+    		this.folders.renameFolder(name, newName);
+    }
+    
+    public void createFolder(String folderName) throws Exception {
+    	if (folderName == null)
+    		throw new Exception("Nome de pasta inválido!");
+    	
+    	if (this.folders != null)
+    		this.folders.createFolder(folderName);
+    }
+    
+    public void moveFolder() throws Exception {}
     
     public void moveMail() throws Exception {}
     
     public void deleteMail() throws Exception {}
-    
-    public void deleteFolder() throws Exception {}
-    
-    public void renameFolder() throws Exception {}
-    
-    public void createFolder() throws Exception {}
-    
-    public void moveFolder() throws Exception {}
+
 }

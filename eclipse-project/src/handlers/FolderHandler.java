@@ -41,7 +41,7 @@ public class FolderHandler
         Folder folder = this.store.getFolder(name);
 
         if (!folder.exists())
-            throw new FolderNotFoundException();
+        	throw new Exception("Pasta não encontrada!");
 
         if (folder.isOpen())
             folder.close(false);
@@ -52,9 +52,11 @@ public class FolderHandler
     public boolean createFolder(String name)  throws Exception {
         Folder folder = this.store.getFolder(name);
 
-        if (!folder.exists())
-            if (folder.create(Folder.HOLDS_MESSAGES))
+        if (!folder.exists()) {
+        	if (folder.create(Folder.HOLDS_MESSAGES))
                 return true;
+        } else
+        	throw new Exception("Pasta já existente!");
 
         return false;
     }
@@ -63,7 +65,7 @@ public class FolderHandler
         Folder folder = this.store.getFolder(name);
 
         if (!folder.exists())
-            throw new FolderNotFoundException();
+            throw new Exception("Pasta não encontrada!");
 
         if (folder.isOpen())
             folder.close(false);
@@ -76,7 +78,7 @@ public class FolderHandler
     		throw new Exception("Pasta inválida!");
     	
         if (!this.store.getFolder(c).exists())
-            throw new FolderNotFoundException();
+        	throw new Exception("Pasta não encontrada!");
     	
     	this.current = c;
     }
@@ -123,16 +125,9 @@ public class FolderHandler
         return mails;
     }
     
-    public void moveMail() throws Exception {
-    	
-    }
+    public void moveMail() throws Exception {}
     
-    public void deleteMail() throws Exception {
-    	
-    }
+    public void deleteMail() throws Exception {}
     
-    
-    public void moveFolder(String origin, String dest) throws Exception {
-    	
-    }
+    public void moveFolder(String origin, String dest) throws Exception {}
 }
