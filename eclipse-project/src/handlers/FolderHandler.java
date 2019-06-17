@@ -101,7 +101,7 @@ public class FolderHandler
     	Folder folder = this.store.getFolder(folderName);
     	folder.open(Folder.READ_ONLY);
 
-        Message[] messages = folder.getMessages(0, 50);
+        Message[] messages = folder.getMessages();
         Mail[] mails = new Mail[messages.length];
         
         int limit = messages.length;

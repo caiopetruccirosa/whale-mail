@@ -48,7 +48,11 @@
         <div class="content-wrapper-before gradient-45deg-indigo-purple"></div>
         <div class="col s12">
           <div class="container">
-
+			 <div style="top:1px; right: 10px;" class="fixed-action-btn">
+              		<a class="btn-large primary-text gradient-shadow modal-trigger" href="../Logout">
+                		<i class="material-icons">add</i>
+              		</a>
+		     </div>
             <!-- Sidebar Area Starts -->
             <div class="sidebar-left sidebar-fixed">
               <div class="sidebar">
@@ -70,25 +74,25 @@
 								}
 							%>
                           	</p>
+                          	
                           	<p class="m-0 text-muted">
+                          	<select>
 							<% 
-								try {
-									out.println(acc.getCurrentAccount().getUser()); 
+							try {
+								for(Account ac : acc.getAccounts())
+									out.println("<option>"+ ac.getUser() +"</option>");
 								}
 								catch(Exception ex) {
 									out.println(ex.getMessage());
 								}
 							%>
+							</select>
 							</p>
                         </div>
                       </div>
                     </div>
                   </div>
-				  <div style="top: 54px; right: 19px;" class="fixed-action-btn direction-top">
-              		<a class="btn-floating btn-large primary-text gradient-shadow modal-trigger" >
-                		<i class="material-icons">add</i>
-              		</a>
-		            </div>
+				 
                   <div id="sidebar-list" class="sidebar-menu list-group position-relative animate fadeLeft ps ps--active-y">
                     <div class="sidebar-list-padding app-sidebar" id="email-sidenav">
                       <ul class="email-list display-grid">
@@ -224,14 +228,14 @@
 
             <!-- Add new email popup -->
             <div style="bottom: 54px; right: 19px;" class="fixed-action-btn direction-top">
-              <a class="btn-floating btn-large primary-text gradient-shadow modal-trigger" href="../Logout">
+              <a class="btn-floating btn-large primary-text gradient-shadow modal-trigger" data-target="modalemail" >
                 <i class="material-icons">add</i>
               </a>
             </div>
             <!-- Add new email popup Ends-->
 
             <!-- Modal Structure -->
-            <div id="modal1" class="modal border-radius-6" tabindex="0">
+            <div id="modalemail" class="modal border-radius-6" tabindex="0">
               <div class="modal-content">
                 <h5 class="mt-0">New Message</h5>
                 <hr>
@@ -467,5 +471,11 @@
     <div class="drag-target right-aligned"></div>
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
+    
+    <script type="text/javascript">
+	
+		$('#modalemail').modal();
+	
+	</script>
   </body>
-</html></html>
+</html>

@@ -68,9 +68,7 @@ public class Authentication extends HttpServlet {
 			if (Users.existe(user))
 				throw new Exception("Usuário já existente!");
 			
-			String senhaCriptografada = Base64.getEncoder().encodeToString(pass.getBytes());
-			Users.cadastrar(new User(0, user, senhaCriptografada));
-			
+			Users.cadastrar(new User(0, user, pass));
 			session.setAttribute("success", "Usuário cadastrado com sucesso!");
 		}
 		catch (Exception ex) {
