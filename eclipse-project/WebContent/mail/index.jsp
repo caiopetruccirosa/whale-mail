@@ -80,7 +80,8 @@ AccountManager acc = (AccountManager)session.getAttribute("user");
 		<li>
 		
 		<div class="input-field">
-    <select>
+    <
+>
       <% 
 				try {
 					for(Account ac : acc.getAccounts()) {
@@ -195,7 +196,7 @@ AccountManager acc = (AccountManager)session.getAttribute("user");
 	  			 <h3>Escrever mensagem</h3>
 	  			 <i class="material-icons prefix center icon-responsive modal-close" style="margin-right: 10px">close</i>
 	  		</div>
-		  <form method="get" action="MailOperations">
+		  <form method="post" action="MailOperations">
 		    <div class="modal-content">
 		      
 						<div class="input-field">
@@ -228,6 +229,56 @@ AccountManager acc = (AccountManager)session.getAttribute("user");
 	          				<label for="message_area">Escrevas sua mensagem...</label>
         				</div>
 						
+        				 <div class="file-field input-field">
+					      <div class="file-path-wrapper">
+					        <i class="material-icons prefix center icon-responsive"><input type="file" multiple>attach_file</i>
+					        <input  id='attachments' name='attachments' class="file-path validate" type="text" placeholder="Upload one or more files" type="text">
+					      </div>
+					    </div>		
+		     </div>
+		     <div class="modal-footer">
+		     	
+		       <a class="modal-close  waves-effect waves-light"><input type="submit">Enviar</a>
+		     </div>
+		    </form>
+		    
+		  </div>
+		  
+		<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+		 
+	<div id="adicionar_conta_modal" class="modal modal-fixed-footer">
+	  		<div class="modal-header">
+	  			 <h3>Adicionar Conta:</h3>
+	  			 <i class="material-icons prefix center icon-responsive modal-close" style="margin-right: 10px">close</i>
+	  		</div>
+		  <form method="get" action="AAAAAAAAAAAAAAAAAAAAA">
+		    <div class="modal-content">
+		      
+						<div class="input-field">
+							<i class="material-icons prefix center icon-responsive modal-close">person</i>
+							<input id="emailaddress" type="text" name="emailaddress">
+							<label for="emailaddress">Endereço de E-mail...</label>
+						</div>
+	
+						<div class="input-field">
+							<i class="material-icons prefix center icon-responsive">lock</i>
+							<input id="pwd" type="text" name="pwd">
+							<label for="pwd">Senha do E-mail...</label>
+						</div>
+						
+						<div class="input-field">
+							<i class="material-icons prefix center icon-responsive">person_add</i>
+							<input id="host" type="text" name="host">
+							<label for="host">Host do E-mail...</label>
+						</div>
+						
+						<div class="input-field">
+							<i class="material-icons prefix center icon-responsive">person_outline</i>
+							<input id="cco" type="text" name="cco">
+							<label for="cco">CCO</label>
+						</div>
+						
+										
         				 <div class="file-field input-field">
 					      <div class="file-path-wrapper">
 					        <i class="material-icons prefix center icon-responsive"><input type="file" multiple>attach_file</i>
