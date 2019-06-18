@@ -19,11 +19,11 @@ public class AccountManager
     {
     	this.user = user;
     	
-        this.accounts = Accounts.getAccounts(user.getId());
+        //this.accounts = Accounts.getAccounts(user.getId());
         
     	// pra teste, porque o BD não ta funfando em casa
-    	// this.accounts = new ArrayList<Account>();
-    	// this.accounts.add(new Account(1, "littleheadfilms@gmail.com", "EmailLH12", "smtp.gmail.com", "IMAP", 587, 1));
+    	this.accounts = new ArrayList<Account>();
+    	this.accounts.add(new Account(1, "littleheadfilms@gmail.com", "EmailLH12", "smtp.gmail.com", "IMAP", 587, 1));
     	
         if (this.accounts.size() > 0)
         	this.setCurrent(0);

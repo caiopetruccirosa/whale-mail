@@ -1,0 +1,75 @@
+@media only screen and (min-width: 992px) {
+  .main-container {
+  	margin-left: 300px;
+  }
+}
+
+body {
+	background: url(../imgs/background.jpg);
+	background-attachment: fixed;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+
+.sidenav li a i.material-icons {
+	margin: 0 16px 0 0 !important;
+}
+
+.mail-collection-item {
+	padding: 10px 20px !important;
+}
+
+.user-header {
+	background: url(../imgs/sea.jpg);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	padding: 15px 0 !important;
+}
+
+.center-div {
+	position: absolute;
+	margin: auto;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.main {
+	position: absolute;
+	width: 510px;
+	height: 390px;
+	overflow: hidden;
+}
+
+.form-div {
+	position: relative;
+	margin-top: 20px
+	width: 100%;
+	border: none;
+	display: none;
+}
+
+.btn {
+	margin: 10px 0;
+	width: 100%;
+}
+
+.opcoes {
+	margin-top: 15px;
+	width: 100%;
+}
+
+button {
+	outline: none;
+}
+
+a {
+	color: white;
+	cursor: pointer;
+}
