@@ -26,7 +26,7 @@
 		session.removeAttribute("success");
 	
 	    if (acc != null)
-	        response.sendRedirect("whalemail/mail/");
+	        response.sendRedirect("mail/");
 	%>
 
 	<body>
@@ -83,7 +83,11 @@
 				</div>
 			</div>
 		</div>
+		
+		
 
+	  
+			
 		<script type="text/javascript" src="js/jquery.js"></script>
 		<script type="text/javascript" src="js/materialize.js"></script>
 		<script type="text/javascript" src="js/script.js"></script>
