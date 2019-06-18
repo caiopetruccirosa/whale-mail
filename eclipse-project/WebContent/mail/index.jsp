@@ -78,8 +78,10 @@ AccountManager acc = (AccountManager)session.getAttribute("user");
 			<a class="waves-effect" href="#"> Todas as contas </a>
 		</li>
 		<li>
-		<select>
-			<% 
+		
+		<div class="input-field">
+    <select>
+      <% 
 				try {
 					for(Account ac : acc.getAccounts()) {
 						out.println("<option class='waves-effect' href='#'>");
@@ -93,8 +95,10 @@ AccountManager acc = (AccountManager)session.getAttribute("user");
 					out.println("</option>");
 				}
 			%>
-			
-		</select>
+    </select>
+    <label>Materialize Select</label>
+  </div>
+		
 	  </li>
       <li>
         <div class="divider"></div>
@@ -191,7 +195,7 @@ AccountManager acc = (AccountManager)session.getAttribute("user");
 	  			 <h3>Escrever mensagem</h3>
 	  			 <i class="material-icons prefix center icon-responsive modal-close" style="margin-right: 10px">close</i>
 	  		</div>
-		  <form method="get" action="Authentication">
+		  <form method="get" action="MailOperations">
 		    <div class="modal-content">
 		      
 						<div class="input-field">
@@ -227,7 +231,7 @@ AccountManager acc = (AccountManager)session.getAttribute("user");
         				 <div class="file-field input-field">
 					      <div class="file-path-wrapper">
 					        <i class="material-icons prefix center icon-responsive"><input type="file" multiple>attach_file</i>
-					        <input  id='attachments' class="file-path validate" type="text" placeholder="Upload one or more files" type="text">
+					        <input  id='attachments' name='attachments' class="file-path validate" type="text" placeholder="Upload one or more files" type="text">
 					      </div>
 					    </div>		
 		     </div>
@@ -245,8 +249,11 @@ AccountManager acc = (AccountManager)session.getAttribute("user");
     <script type="text/javascript" src="../js/script.js"></script>
 
     <script type="text/javascript">
+    $(document).ready(function(){
       $('.sidenav').sidenav();
       $('.modal').modal();
+      $('select').formSelect();
+    });
     </script>
   </body>
 </html>

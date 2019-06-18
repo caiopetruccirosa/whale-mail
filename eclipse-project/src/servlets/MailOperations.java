@@ -1,9 +1,9 @@
 package servlets;
 
-import java.io.File;
+import java.io.*;
 import java.io.IOException;
 
-import javax.mail.Part;
+import javax.activation.FileDataSource;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,7 +16,8 @@ import mail.*;
 import java.util.*;
 import handlers.MailHandler;
 import accountmanager.AccountManager;
-
+import javax.servlet.http.Part;
+import java.io.*;
 
 /**
  * Servlet implementation class MailOperations
@@ -48,39 +49,38 @@ public class MailOperations extends HttpServlet {
 		HttpSession session = request.getSession();	
 		AccountManager acc = (AccountManager) session.getAttribute("user");
 		String from = acc.getUser().getUser();
-		String to = request.getParameter("to");
+		String[] to = request.getParameter("to").split(null);
 		String subject = request.getParameter("Subject");
 		String[] cc = request.getParameter("cc").split(null);
 		String[] cco = request.getParameter("cco").split(null);
 		Object message = request.getParameter("message_area");
-		String[] attachments = ;
-		ArrayList<Attachment> at_array = null;
-		/*for(int i=0; i<attachments.length();i++)
-		{
-			
-		}*/
-		Date sentDate = new Date();
+		Date sentDate = new Date();	
 		
-		Mail mail = new Mail(from, to, cc, cco, subject, message, sentDate);
-		
-		MailHandler handler = new MailHandler(acc.getCurrentAccount());
-		handler.sendEmail(mail, "text/html");
 		try {
-			
+		ArrayList<File> files = saveUploadedFiles(request);
+		ArrayList<Attachment> at_array = new ArrayList<>();
+		for(int i=0; i<files.size() ;i++) {
+			FileDataSource fds = new FileDataSource(files.get(i));
+			Attachment at = new Attachment(fds, fds.getName(), null);
+			at_array.add(at);
 		}
-		catch{}
-
-		
-		
+			Mail mail = new Mail(from, to, cc, cco, subject, message, sentDate, at_array);
+			MailHandler handler = new MailHandler(acc.getCurrentAccount());
+			handler.sendEmail(mail, "text/html");
+		}
+		catch(Exception ex){
+			ex.getMessage();
+		}
 		
 	}
 	
-	private List<File> saveUploadedFiles(HttpServletRequest request)
+	private ArrayList<File> saveUploadedFiles(HttpServletRequest request)
             throws IllegalStateException, IOException, ServletException {
-        List<File> listFiles = new ArrayList<File>();
+        ArrayList<File> listFiles = new ArrayList<File>();
         byte[] buffer = new byte[4096];
         int bytesRead = -1;
         Collection<Part> multiparts = request.getParts();
+     
         if (multiparts.size() > 0) {
             for (Part part : request.getParts()) {
                 // creates a file to be saved

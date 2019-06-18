@@ -114,10 +114,12 @@ public class FolderHandler
         	
         	Object msg = messages[i].getContent();
         	Date date = messages[i].getSentDate();
-        	
+        	String[] to = new String[1];
+        	to[0] = this.acc.getUser();
         	String subject = messages[i].getSubject();
         	
-        	Mail aux = new Mail(from, this.acc.getUser(), null, null, subject, msg, date);
+        	
+        	Mail aux = new Mail(from, to, null, null, subject, msg, date, null);
         	
         	mails[i] = aux;
         }

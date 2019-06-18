@@ -1,6 +1,10 @@
 package handlers;
 
+import java.io.*;
 import java.util.*;
+
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.*;
 import bd.dbos.*;
@@ -33,7 +37,9 @@ public class MailHandler {
     		Message msg = new MimeMessage(this.session);
     		
             msg.setFrom(new InternetAddress(mail.getFrom()));
-            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mail.getTo()));
+            String[] to = mail.getTo();
+            for(int i = 0; i<to.length ;i++)
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to[i]));
             
             String[] cc = mail.getCC();
             for (int i = 0; i < cc.length; i++)
@@ -51,15 +57,16 @@ public class MailHandler {
             body.setContent(mail.getMessage(), format);
             multipart.addBodyPart(body);
             
-            Attachment[] atts = mail.getAttachments();
-            for (int i = 0; i < atts.length; i++) {
+            ArrayList<Attachment> atts = mail.getAttachments();
+            for (int i = 0; i < atts.size(); i++) {
             	MimeBodyPart attachment = new MimeBodyPart();
-            	attachment.setDataHandler(atts[i].getDataHandler());
+            	attachment.setDataHandler(atts.get(i).getDataHandler());
+            			
             	
-            	if (atts[i].getFilename() != null) {
-            		attachment.setFileName(atts[i].getName());
-            	} else if (atts[i].getId() != null) {
-            		attachment.setHeader("Content-ID", atts[i].getId());
+            	if (atts.get(i).getFilename() != null) {
+            		attachment.setFileName(atts.get(i).getName());
+            	} else if (atts.get(i).getId() != null) {
+            		attachment.setHeader("Content-ID", atts.get(i).getId());
             	}
             	
             	multipart.addBodyPart(attachment);

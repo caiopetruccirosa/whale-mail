@@ -2,10 +2,11 @@ package mail;
 
 import java.util.*;
 import javax.mail.internet.*;
+import java.io.*;
 
 public class Mail implements Cloneable {
 	protected String from;
-    protected String to;
+    protected String[] to;
     protected String subject;
     protected String[] cc;
     protected String[] bcc;
@@ -13,11 +14,11 @@ public class Mail implements Cloneable {
     protected Object message;
     protected ArrayList<Attachment> attachments;
 
-    public Mail(String from, String to, String[] cc, String[] bcc, String subject, Object message, Date date) throws Exception {
+    public Mail(String from, String[] to, String[] cc, String[] bcc, String subject, Object message, Date date, ArrayList<Attachment> attachments) throws Exception {
     	if (from == null || from.trim() == "")
     		throw new Exception("Remetente nulo!");
     	
-    	if (to == null || to.trim() == "")
+    	if (to.length < 0)
     		throw new Exception("Destinatário nulo!");
     	
     	if (subject == null || subject.trim() == "")
@@ -27,7 +28,11 @@ public class Mail implements Cloneable {
     		throw new Exception("Mensagem nula!");
     	
     	this.from = from;
-    	this.to = to;
+    	
+    	this.to = new String[to.length];
+  
+    	for(int i = 0; i<to.length;i++)
+    		this.to[i] = to[i];
     	
     	if (cc != null) {
 			this.cc = new String[cc.length];
@@ -51,7 +56,7 @@ public class Mail implements Cloneable {
     	this.message = message;
     	this.date = date;
     	
-    	this.attachments = new ArrayList<Attachment>();
+    	this.attachments = new ArrayList<Attachment>(attachments);
     }
     
     public Date getDate() {
@@ -62,7 +67,7 @@ public class Mail implements Cloneable {
     	return this.from;
     }
     
-    public String getTo() {
+    public String[] getTo() {
     	return this.to;
     }
     
@@ -82,8 +87,8 @@ public class Mail implements Cloneable {
     	return this.message;
     }
     
-    public Attachment[] getAttachments() {
-    	return (Attachment[]) this.attachments.toArray();
+    public ArrayList<Attachment> getAttachments() {
+    	return (ArrayList<Attachment>) this.attachments;
     }
     
     public void addAttachment(Attachment a) throws Exception {
@@ -97,9 +102,11 @@ public class Mail implements Cloneable {
     	int ret = 3;
     	
     	ret += this.from.hashCode()*7;
-    	ret += this.to.hashCode()*7;
     	ret += this.subject.hashCode()*7;
     	ret += this.message.hashCode()*7;
+    	
+    	for(int i=0; i<this.to.length; i++)
+    		ret += this.to[i].hashCode()*7;
     	
     	if (this.cc != null)
 	    	for (int i = 0; i < this.cc.length; i++)
@@ -113,7 +120,7 @@ public class Mail implements Cloneable {
     }
 
     public String toString() {
-    	return "{" + this.from + ":" + this.to + ":" + this.subject + ":" + this.message + ":" + "}";
+    	return "{" + this.from + ":" + this.to.toString() + ":" + this.subject + ":" + this.message + ":" + "}";
     }
 
     public boolean equals(Object obj) {
@@ -131,9 +138,6 @@ public class Mail implements Cloneable {
         if (!this.from.equals(m.from))
         	return false;
         
-        if (!this.to.equals(m.to))
-        	return false;
-        
         if (!this.subject.equals(m.subject))
         	return false;
         
@@ -142,6 +146,15 @@ public class Mail implements Cloneable {
             	return false;
         else
         	return false;
+        
+        if (this.to != null && m.to != null) {
+        	if (this.to.length != m.to.length)
+            	return false;
+            
+            for (int i = 0; i < this.to.length; i++)
+            	if (!this.to[i].equals(m.to[i]))
+            		return false;
+        }
         
         if (this.cc != null && m.cc != null) {
         	if (this.cc.length != m.cc.length)
@@ -186,7 +199,11 @@ public class Mail implements Cloneable {
     		throw new Exception("Modelo nulo!");
     	
     	this.from = m.from;
-    	this.to = m.to;
+    	
+    	this.to = new String[m.to.length];
+    	for (int i=0;i<m.to.length;i++) {
+    		this.to[i] = m.to[i];
+    	}
     	
     	if (m.cc != null)
     		this.cc = null;
@@ -203,6 +220,8 @@ public class Mail implements Cloneable {
         	for (int i = 0; i < m.bcc.length; i++)
         		this.bcc[i] = m.bcc[i];
     	}
+    	
+    	
     	
     	this.subject = m.subject;
     	this.message = m.message;
