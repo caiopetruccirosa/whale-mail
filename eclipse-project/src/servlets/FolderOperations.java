@@ -65,23 +65,25 @@ public class FolderOperations extends HttpServlet {
 		if (request.getParameter("message") != null)
 			message = Integer.parseInt(request.getParameter("message"));
 
-		try {		
-			if (action.equals("create")) {
-				acc.createFolder(folder);
-				session.setAttribute("success", "Pasta criada com sucesso!");
-				acc.setCurrentFolder(folder);
-			} else if (action.equals("rename")) {
-				acc.renameFolder(folder, newFolder);
-				session.setAttribute("success", "Pasta renomeada com sucesso!");
-				acc.setCurrentFolder(newFolder);
-			} else if (action.equals("delete")) {
-				acc.deleteFolder(folder);
-				acc.setCurrentFolder("INBOX");
-				session.setAttribute("success", "Pasta deletada com sucesso!");
-			} else if (action.equals("delete_mail")) {
-				acc.deleteMail(folder, message);
-				session.setAttribute("success", "E-mail deletado com sucesso!");
-				acc.setCurrentFolder(folder);
+		try {
+			if (action != null) {
+				if (action.equals("create")) {
+					acc.createFolder(folder);
+					session.setAttribute("success", "Pasta criada com sucesso!");
+					acc.setCurrentFolder(folder);
+				} else if (action.equals("rename")) {
+					acc.renameFolder(folder, newFolder);
+					session.setAttribute("success", "Pasta renomeada com sucesso!");
+					acc.setCurrentFolder(newFolder);
+				} else if (action.equals("delete")) {
+					acc.deleteFolder(folder);
+					acc.setCurrentFolder("INBOX");
+					session.setAttribute("success", "Pasta deletada com sucesso!");
+				} else if (action.equals("delete_mail")) {
+					acc.deleteMail(folder, message);
+					session.setAttribute("success", "E-mail deletado com sucesso!");
+					acc.setCurrentFolder(folder);
+				}	
 			}
 		} catch (Exception ex) {
 			session.setAttribute("err", ex.getMessage());
