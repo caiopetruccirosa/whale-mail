@@ -72,22 +72,24 @@ public class AccountOperations extends HttpServlet {
 		if (request.getParameter("owner_id") != null)
 			owner_id = Integer.parseInt(request.getParameter("owner_id"));
 		
-		try {			
-		    if (action.equals("add")) {
-		    	Account newAcc = new Account(id, user, pass, host, protocol, port, owner_id);
-		    	acc.addAccount(newAcc);
-		    	
-		    	session.setAttribute("success", "Conta adicionada com sucesso!");
-		    } else if (action.equals("update")) {
-		    	Account newAcc = new Account(id, user, pass, host, protocol, port, owner_id);
-		    	acc.updateAccount(newAcc);
-		    	
-		    	session.setAttribute("success", "Conta atualizada com sucesso!");
-		    } else if (action.equals("delete")) {
-		    	acc.deleteAccount(id);
-		    	
-		    	session.setAttribute("success", "Conta deletada com sucesso!");
-		    } 
+		try {
+			if (action != null) {
+				if (action.equals("add")) {
+			    	Account newAcc = new Account(id, user, pass, host, protocol, port, owner_id);
+			    	acc.addAccount(newAcc);
+			    	
+			    	session.setAttribute("success", "Conta adicionada com sucesso!");
+			    } else if (action.equals("update")) {
+			    	Account newAcc = new Account(id, user, pass, host, protocol, port, owner_id);
+			    	acc.updateAccount(newAcc);
+			    	
+			    	session.setAttribute("success", "Conta atualizada com sucesso!");
+			    } else if (action.equals("delete")) {
+			    	acc.deleteAccount(id);
+			    	
+			    	session.setAttribute("success", "Conta deletada com sucesso!");
+			    } 
+			}
 		} catch (Exception ex) {
 			session.setAttribute("err", ex.getMessage());
 		}
