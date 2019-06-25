@@ -25,8 +25,8 @@
 		        
 		        <div class="row">
 					<div class="input-field col s12">
-						<input id="dest" type="text" name="dest">
-						<label for="dest">Destinatário</label>
+						<input id="to" type="text" name="to">
+						<label for="to">Destinatário</label>
 					</div>
 				</div>
 				

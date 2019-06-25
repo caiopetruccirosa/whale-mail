@@ -25,14 +25,30 @@ public class FolderHandler
         
         this.PAGE_LIMIT = 10;
         
-        Properties prop = new Properties();        
-        prop.put("mail.imap.host", "imap.gmail.com");
-        prop.put("mail.imap.port", "imap");
-        prop.put("mail.imap.starttls.enable", "true");
-
-        this.session = Session.getDefaultInstance(prop);
+        Properties props = System.getProperties();
+    	
+    	props.put("mail.smtp.host", this.acc.getHost());
+    	props.put("mail.smtp.starttls.enable", "true");
+    	props.put("mail.smtp.user", this.acc.getUser());
+    	props.put("mail.smtp.password", this.acc.getPassword());
+    	props.put("mail.smtp.port", "587");
+    	props.put("mail.smtp.auth", "true");
+    	
+    	Authenticator auth = new Authenticator() {
+	    	public PasswordAuthentication getPasswordAuthentication() {
+		    	String username = acc.getUser();
+		    	String password = acc.getPassword();
+		    	
+		    	if ((username != null) && (username.length() > 0) && (password != null) && (password.length () > 0))
+		    		return new PasswordAuthentication(username, password);
+		    	
+	    		return null;
+	    	}
+    	};
+        
+        this.session = Session.getInstance(props, auth);
         this.store = this.session.getStore("imaps");
-        this.store.connect("imap.gmail.com", acc.getUser(), acc.getPassword());
+        this.store.connect("imap.gmail.com", this.acc.getUser(), this.acc.getPassword());
         
         this.current = "INBOX";
     }
@@ -141,13 +157,11 @@ public class FolderHandler
         	
         	Object msg = messages[i].getContent();
         	Date date = messages[i].getSentDate();
-        	String[] to = new String[1];
-        	to[0] = this.acc.getUser();
+        	String to = this.acc.getUser();
         	String subject = messages[i].getSubject();
         	int id = messages[i].getMessageNumber();
         	
-        	
-        	Mail aux = new Mail(id, from, to, null, null, subject, msg, date, null, foldername);
+        	Mail aux = new Mail(id, from, to, null, null, subject, msg, date, null);
         	
         	mails[i] = aux;
         }
@@ -190,11 +204,10 @@ public class FolderHandler
     	
     	Object msg = msgObj.getContent();
     	Date date = msgObj.getSentDate();
-    	String[] to = new String[1];
-    	to[0] = this.acc.getUser();
+    	String to = this.acc.getUser();
     	String subject = msgObj.getSubject();
     	int id = msgObj.getMessageNumber();
     	
-    	return new Mail(id, from, to, null, null, subject, msg, date, null, foldername);
+    	return new Mail(id, from, to, null, null, subject, msg, date, null);
     }
 }

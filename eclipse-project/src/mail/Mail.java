@@ -7,20 +7,19 @@ import java.io.*;
 public class Mail implements Cloneable {
 	protected int id;
 	protected String from;
-    protected String[] to;
+    protected String to;
     protected String subject;
     protected String[] cc;
     protected String[] bcc;
     protected Date date;
     protected Object message;
     protected ArrayList<Attachment> attachments;
-    protected String folder;
 
-    public Mail(int id, String from, String[] to, String[] cc, String[] bcc, String subject, Object message, Date date, ArrayList<Attachment> attachments, String folder) throws Exception {
+    public Mail(int id, String from, String to, String[] cc, String[] bcc, String subject, Object message, Date date, ArrayList<Attachment> attachments) throws Exception {
     	if (from == null || from.trim() == "")
     		throw new Exception("Remetente nulo!");
     	
-    	if (to.length < 0)
+    	if (to == null || to.trim() == "")
     		throw new Exception("Destinatário nulo!");
     	
     	if (subject == null || subject.trim() == "")
@@ -29,15 +28,9 @@ public class Mail implements Cloneable {
     	if (message == null)
     		throw new Exception("Mensagem nula!");
     	
-    	if (folder == null)
-    		throw new Exception("Pasta nula!");
-    	
     	this.from = from;
     	
-    	this.to = new String[to.length];
-  
-    	for(int i = 0; i<to.length;i++)
-    		this.to[i] = to[i];
+    	this.to = to;
     	
     	if (cc != null) {
 			this.cc = new String[cc.length];
@@ -63,16 +56,10 @@ public class Mail implements Cloneable {
     	this.date = date;
     	
     	this.attachments = attachments;
-    	
-    	this.folder = folder;
     }
     
     public int getId() {
     	return this.id;
-    }
-    
-    public String getFolder() {
-    	return this.folder;
     }
     
     public Date getDate() {
@@ -83,7 +70,7 @@ public class Mail implements Cloneable {
     	return this.from;
     }
     
-    public String[] getTo() {
+    public String getTo() {
     	return this.to;
     }
     
@@ -121,9 +108,7 @@ public class Mail implements Cloneable {
     	ret += this.from.hashCode()*7;
     	ret += this.subject.hashCode()*7;
     	ret += this.message.hashCode()*7;
-    	
-    	for(int i=0; i<this.to.length; i++)
-    		ret += this.to[i].hashCode()*7;
+    	ret += this.to.hashCode()*7;
     	
     	if (this.cc != null)
 	    	for (int i = 0; i < this.cc.length; i++)
@@ -133,13 +118,11 @@ public class Mail implements Cloneable {
 	    	for (int i = 0; i < this.bcc.length; i++)
 	    		ret += this.bcc[i].hashCode()*7;
     	
-    	ret += this.folder.hashCode()*7;
-    	
     	return ret;
     }
 
     public String toString() {
-    	return "{" + this.id + ":" + this.from + ":" + this.to.toString() + ":" + this.subject + ":" + this.message + ":" + this.folder + "}";
+    	return "{" + this.id + ":" + this.from + ":" + this.to.toString() + ":" + this.subject + ":" + this.message + "}";
     }
 
     public boolean equals(Object obj) {
@@ -170,12 +153,8 @@ public class Mail implements Cloneable {
         	return false;
         
         if (this.to != null && m.to != null) {
-        	if (this.to.length != m.to.length)
+        	if (!this.to.equals(m.to))
             	return false;
-            
-            for (int i = 0; i < this.to.length; i++)
-            	if (!this.to[i].equals(m.to[i]))
-            		return false;
         }
         
         if (this.cc != null && m.cc != null) {
@@ -196,13 +175,6 @@ public class Mail implements Cloneable {
 	        for (int i = 0; i < this.bcc.length; i++)
 	        	if (!this.bcc[i].equals(m.bcc[i]))
 	        		return false;
-        }
-        else
-        	return false;
-        
-        if (this.folder != null && m.folder != null) {
-        	if (!this.folder.equals(m.folder))
-        		return false;
         }
         else
         	return false;
@@ -230,10 +202,7 @@ public class Mail implements Cloneable {
     	this.id = m.id;
     	this.from = m.from;
     	
-    	this.to = new String[m.to.length];
-    	for (int i=0;i<m.to.length;i++) {
-    		this.to[i] = m.to[i];
-    	}
+    	this.to = to;
     	
     	if (m.cc != null)
     		this.cc = null;
@@ -259,7 +228,5 @@ public class Mail implements Cloneable {
     	this.attachments = new ArrayList<>(m.attachments);
     	
     	this.date = (Date) m.date.clone();
-    	
-    	this.folder = m.folder;
     }
 }

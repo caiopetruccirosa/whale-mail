@@ -31,49 +31,53 @@ public class MailOperations extends HttpServlet {
      */
     public MailOperations() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		response.sendRedirect("/whalemail/mail/");
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session = request.getSession();	
+		HttpSession session = request.getSession();
 		AccountManager acc = (AccountManager) session.getAttribute("user");
+		
 		String from = acc.getUser().getUser();
-		String[] to = request.getParameter("to").split(null);
-		String subject = request.getParameter("Subject");
-		String[] cc = request.getParameter("cc").split(null);
-		String[] cco = request.getParameter("cco").split(null);
-		Object message = request.getParameter("message_area");
+		String to = request.getParameter("to");
+		String subject = request.getParameter("subject");
+		
+		String[] cc = null;
+		if (!request.getParameter("cc").equals("") || request.getParameter("cc") != null)
+			cc = request.getParameter("cc").split(" ");
+		
+		String[] bcc = null;
+		if (!request.getParameter("bcc").equals("") || request.getParameter("bcc") != null)
+			bcc = request.getParameter("bcc").split(" ");
+		
+		Object message = request.getParameter("message");
 		Date sentDate = new Date();	
 		
 		try {
-		ArrayList<File> files = saveUploadedFiles(request);
-		ArrayList<Attachment> at_array = new ArrayList<>();
-		for(int i=0; i<files.size() ;i++) {
-			FileDataSource fds = new FileDataSource(files.get(i));
-			Attachment at = new Attachment(fds, fds.getName(), null);
-			at_array.add(at);
-		}
-			Mail mail = new Mail(0, from, to, cc, cco, subject, message, sentDate, at_array, "INBOX");
+			Mail mail = new Mail(0, from, to, cc, bcc, subject, message, sentDate, null);
+			
 			MailHandler handler = new MailHandler(acc.getCurrentAccount());
-			handler.sendEmail(mail, "text/html");
-		}
-		catch(Exception ex){
-			ex.getMessage();
+			handler.sendEmail(mail);
+			
+			session.setAttribute("success", "E-mail enviado com sucesso!");
+		} catch (Exception ex) {
+			session.setAttribute("err", ex.getMessage());
 		}
 		
+		session.setAttribute("user", acc);	
+		response.sendRedirect("/whalemail/mail/");
 	}
 	
+	/*
 	private ArrayList<File> saveUploadedFiles(HttpServletRequest request)
             throws IllegalStateException, IOException, ServletException {
         ArrayList<File> listFiles = new ArrayList<File>();
@@ -111,6 +115,7 @@ public class MailOperations extends HttpServlet {
     /**
      * Retrieves file name of a upload part from its HTTP header
      */
+	/*
     private String extractFileName(Part part) {
         String contentDisp = part.getHeader("content-disposition");
         String[] items = contentDisp.split(";");
@@ -121,10 +126,13 @@ public class MailOperations extends HttpServlet {
         }
         return null;
     }
-
+	*/
+    
+    /*
     /**
      * Deletes all uploaded files, should be called after the e-mail was sent.
      */
+    /*
     private void deleteUploadFiles(List<File> listFiles) {
         if (listFiles != null && listFiles.size() > 0) {
             for (File aFile : listFiles) {
@@ -132,5 +140,5 @@ public class MailOperations extends HttpServlet {
             }
         }
     }
-
+    */
 }

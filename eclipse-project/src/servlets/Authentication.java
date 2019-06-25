@@ -42,7 +42,7 @@ public class Authentication extends HttpServlet {
 			
 			if (Users.existe(user, pass)) {
 				session.setAttribute("user", new AccountManager(Users.getUser(user)));				
-				response.sendRedirect("/whalemail/mail/");
+				response.sendRedirect("/whalemail/mail/message.jsp?message=1");
 			} else {
 				throw new Exception("Usuário ou senha estão incorretos!");
 			}
