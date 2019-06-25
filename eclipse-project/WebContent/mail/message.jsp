@@ -75,6 +75,7 @@ import="accountmanager.*, bd.dbos.*, javax.mail.*, java.util.*, mail.*, javax.ma
       		out.println("<div class='row'>");
       		out.println("<div class='col s12'>");
       		
+      		/*
       		if (mail.getMessage() instanceof String) {
       			out.println("<p class='flow-text'>");
           		out.println(mail.getMessage());
@@ -88,6 +89,12 @@ import="accountmanager.*, bd.dbos.*, javax.mail.*, java.util.*, mail.*, javax.ma
       			out.println(part.getContent().toString());
       			out.println("</p>");
       		}
+      		*/
+      		out.println(mail.getMessage());
+      		
+      		if (mail.getAttachments() != null)
+      			out.println("<a href='#' class='circle waves-effect'><i class='material-icons'>file_download</i></a>");
+      		
       		out.println("</div>");
       		out.println("</div>");
 

@@ -3,9 +3,14 @@ package handlers;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeMultipart;
+
 import bd.dbos.*;
 import mail.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.*;
 
 public class FolderHandler
@@ -183,6 +188,34 @@ public class FolderHandler
     	msg.setFlag(Flags.Flag.DELETED, true);
     }
     
+    public ArrayList<File> getAttachments(Object msg) throws Exception
+    {
+    	if (!(msg instanceof Multipart))
+    		return null;
+    	
+        Multipart multipart = (Multipart) msg;
+
+        ArrayList<File> attachments = new ArrayList<File>();
+        for (int i = 0; i < multipart.getCount(); i++) {
+            BodyPart bodyPart = multipart.getBodyPart(i);
+            if(!Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition()) && (bodyPart.getFileName() == null || bodyPart.getFileName().isEmpty())) {
+                continue; // dealing with attachments only
+            }
+            InputStream is = bodyPart.getInputStream();
+            File f = new File(bodyPart.getFileName());
+            FileOutputStream fos = new FileOutputStream(f);
+            byte[] buf = new byte[4096];
+            int bytesRead;
+            while((bytesRead = is.read(buf))!=-1) {
+                fos.write(buf, 0, bytesRead);
+            }
+            fos.close();
+            attachments.add(f);
+        }
+
+        return attachments;
+    }
+    
     public Mail getMail(String foldername, int message) throws Exception {
     	if (foldername == null || foldername.trim() == "")
     		throw new Exception("Pasta inválida");
@@ -197,17 +230,18 @@ public class FolderHandler
     	
     	folder.open(Folder.READ_ONLY);
     	
-        Message msgObj = folder.getMessage(message);
+        Message msg = folder.getMessage(message);
         
-        InternetAddress addressFrom = (InternetAddress) msgObj.getFrom()[0];
+        InternetAddress addressFrom = (InternetAddress) msg.getFrom()[0];
     	String from = addressFrom.getPersonal();
-    	
-    	Object msg = msgObj.getContent();
-    	Date date = msgObj.getSentDate();
+    	   	
+    	Object obj = msg.getContent();    	
+    	Date date = msg.getSentDate();
     	String to = this.acc.getUser();
-    	String subject = msgObj.getSubject();
-    	int id = msgObj.getMessageNumber();
+    	String subject = msg.getSubject();
+    	int id = msg.getMessageNumber();
+    	ArrayList<File> atts = this.getAttachments(obj);
     	
-    	return new Mail(id, from, to, null, null, subject, msg, date, null);
+    	return new Mail(id, from, to, null, null, subject, obj, date, atts);
     }
 }

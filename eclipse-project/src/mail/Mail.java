@@ -1,8 +1,11 @@
 package mail;
 
 import java.util.*;
+
+import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.*;
+
 
 public class Mail implements Cloneable {
 	protected int id;
@@ -13,9 +16,9 @@ public class Mail implements Cloneable {
     protected String[] bcc;
     protected Date date;
     protected Object message;
-    protected ArrayList<Attachment> attachments;
+    protected ArrayList<File> attachments;
 
-    public Mail(int id, String from, String to, String[] cc, String[] bcc, String subject, Object message, Date date, ArrayList<Attachment> attachments) throws Exception {
+    public Mail(int id, String from, String to, String[] cc, String[] bcc, String subject, Object message, Date date, ArrayList<File> attachments) throws Exception {
     	if (from == null || from.trim() == "")
     		throw new Exception("Remetente nulo!");
     	
@@ -86,19 +89,55 @@ public class Mail implements Cloneable {
     	return this.subject;
     }
     
-    public Object getMessage() {
-    	return this.message;
+    public String getMessage() throws Exception {
+    	String ret = null;
+    	
+    	if (this.message instanceof String)
+    		ret = (String)this.message;
+    	else
+    		if (this.message instanceof MimeMultipart)
+    			ret = this.getTextFromMimeMultipart((MimeMultipart)this.message);
+    	
+    	return ret;
     }
     
-    public ArrayList<Attachment> getAttachments() {
-    	return (ArrayList<Attachment>) this.attachments;
+    public ArrayList<File> getAttachments() {
+    	return (ArrayList<File>) this.attachments;
     }
     
-    public void addAttachment(Attachment a) throws Exception {
+    public void addAttachment(File a) throws Exception {
     	if (a == null)
     		throw new Exception("Attachment nulo!");
     	
     	this.attachments.add(a);
+    }
+    
+    protected String getTextFromMimeMultipart(MimeMultipart mimeMultipart) throws Exception
+    {
+        String result = "";
+        int count = mimeMultipart.getCount();
+        for (int i = 0; i < count; i++)
+        {
+            BodyPart bodyPart = mimeMultipart.getBodyPart(i);
+            if (bodyPart.isMimeType("text/plain"))
+            {
+                result = result + "\n" + bodyPart.getContent();
+                break; // without break same text appears twice in my tests
+            }
+            else if (bodyPart.isMimeType("text/html"))
+            {
+                String html = (String) bodyPart.getContent();
+                result = result + "\n" + org.jsoup.Jsoup.parse(html).text();
+            }
+            else if (bodyPart.getContent() instanceof MimeMultipart)
+            {
+                result = result + getTextFromMimeMultipart((MimeMultipart)bodyPart.getContent());
+            }
+        }
+
+        //result = result.replace("<", "&lt;").replace(">", "&gt;");
+
+        return result;
     }
 
     public int hashCode() {
@@ -120,7 +159,7 @@ public class Mail implements Cloneable {
     	
     	return ret;
     }
-
+    
     public String toString() {
     	return "{" + this.id + ":" + this.from + ":" + this.to.toString() + ":" + this.subject + ":" + this.message + "}";
     }
@@ -202,7 +241,7 @@ public class Mail implements Cloneable {
     	this.id = m.id;
     	this.from = m.from;
     	
-    	this.to = to;
+    	this.to = m.to;
     	
     	if (m.cc != null)
     		this.cc = null;

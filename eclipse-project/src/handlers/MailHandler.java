@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -72,17 +73,13 @@ public class MailHandler {
             body.setContent((String) mail.getMessage(), "text/html");
             multipart.addBodyPart(body);
             
-            ArrayList<Attachment> atts = mail.getAttachments();
+            ArrayList<File> atts = mail.getAttachments();
             if (atts != null) {
             	for (int i = 0; i < atts.size(); i++) {
                 	MimeBodyPart attachment = new MimeBodyPart();
-                	attachment.setDataHandler(atts.get(i).getDataHandler());
-                			
-                	if (atts.get(i).getFilename() != null) {
-                		attachment.setFileName(atts.get(i).getName());
-                	} else if (atts.get(i).getId() != null) {
-                		attachment.setHeader("Content-ID", atts.get(i).getId());
-                	}
+                	
+                	attachment.setDataHandler(new DataHandler(new FileDataSource(atts.get(i))));
+                	attachment.setFileName(atts.get(i).getName());
                 	
                 	multipart.addBodyPart(attachment);
                 }
