@@ -1,9 +1,7 @@
 package handlers;
 
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-
-import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeMultipart;
+import javax.mail.internet.*;
 
 import bd.dbos.*;
 import mail.*;
@@ -36,7 +34,7 @@ public class FolderHandler
     	props.put("mail.smtp.starttls.enable", "true");
     	props.put("mail.smtp.user", this.acc.getUser());
     	props.put("mail.smtp.password", this.acc.getPassword());
-    	props.put("mail.smtp.port", "587");
+    	props.put("mail.smtp.port", this.acc.getPort());
     	props.put("mail.smtp.auth", "true");
     	
     	Authenticator auth = new Authenticator() {
@@ -57,7 +55,17 @@ public class FolderHandler
         
         this.current = "INBOX";
     }
+    
+    public void connect() throws Exception {
+    	if (!this.store.isConnected())
+    		this.store.connect();
+    }
 
+    public void close() throws Exception {
+    	if (this.store.isConnected())
+    		this.store.close();
+    }
+    
     public void renameFolder(String foldername, String newName)  throws Exception
     {
     	if (foldername == null || foldername.trim() == "")
@@ -123,7 +131,7 @@ public class FolderHandler
 
     public Folder[] getFolders() throws Exception
     {
-        return this.store.getDefaultFolder().list("*");
+        return this.store.getDefaultFolder().list();
     }
 
     public Mail[] getCurrentMails(int page) throws Exception
@@ -186,6 +194,41 @@ public class FolderHandler
     	
     	Message msg = folder.getMessage(message);
     	msg.setFlag(Flags.Flag.DELETED, true);
+    	
+    	folder.expunge();
+    	folder.close(true);
+    }
+    
+    public void moveMail(String foldername, String newFoldername, int message) throws Exception {
+    	if (foldername == null || foldername.trim() == "")
+    		throw new Exception("Pasta inválido!");
+    	
+    	if (newFoldername == null || newFoldername.trim() == "")
+    		throw new Exception("Nova pasta inválido!");
+    	
+    	if (message < 0)
+    		throw new Exception("Mensagem inválida!");
+    	
+    	Folder folder = this.store.getFolder(foldername);
+    	Folder newFolder = this.store.getFolder(newFoldername);
+    	
+    	if (!folder.exists())
+    		throw new Exception("Pasta origem inexistente!");
+    	
+    	if (!newFolder.exists())
+    		throw new Exception("Pasta destino inexistente!");
+    	
+    	folder.open(Folder.READ_WRITE);
+    	newFolder.open(Folder.READ_WRITE);
+    	
+    	Message[] msgs = new Message[1]; 
+    	msgs[0] = folder.getMessage(message);
+    	
+    	folder.copyMessages(msgs, newFolder);
+    	msgs[0].setFlag(Flags.Flag.DELETED, true);
+    	
+    	folder.expunge();
+    	folder.close(true);
     }
     
     public ArrayList<File> getAttachments(Object msg) throws Exception

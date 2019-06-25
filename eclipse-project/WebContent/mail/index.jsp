@@ -65,7 +65,9 @@
 			      out.println("<li class='collection-item avatar mail-collection-item'>");
 			      out.println("<span class='title text-bold'>" + aux.getFrom() + "</span>");
 			      out.println("<p>");
-			      out.println(aux.getSubject());
+			      out.println("Data: " + (aux.getDate().getDay()+23) + "/" + (aux.getDate().getMonth()+1) + "/" + (1900 + aux.getDate().getYear()) + "<br/>");
+			      out.println("Horário: " + aux.getDate().getHours() + "h" + aux.getDate().getMinutes() + "<br/>");
+			      out.println("Assunto: " + aux.getSubject());
 			      out.println("</p>");
 			      out.println("<a href='message.jsp?message=" + aux.getId() + "' class='secondary-content'>");
 			      out.println("<i class='material-icons'>arrow_forward</i>");
@@ -113,11 +115,11 @@
 			session.removeAttribute("success");
 			
 			if (err != null)
-				out.println("M.toast({html: '" + err + "'})");
+				out.println("M.toast({html: \"" + err + "\"})");
 			
 			
 			if (success != null)
-				out.println("M.toast({html: '" + success + "'})");
+				out.println("M.toast({html: \"" + success + "\"})");
 		%>
 	</script>
   </body>

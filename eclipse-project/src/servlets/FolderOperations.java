@@ -83,7 +83,11 @@ public class FolderOperations extends HttpServlet {
 					acc.deleteMail(folder, message);
 					session.setAttribute("success", "E-mail deletado com sucesso!");
 					acc.setCurrentFolder(folder);
-				}	
+				} else if (action.equals("move_mail")) {
+					acc.moveMail(acc.getCurrentFolder().getName(), newFolder, message);
+					session.setAttribute("success", "E-mail movido com sucesso!");
+					acc.setCurrentFolder(folder);
+				}
 			}
 		} catch (Exception ex) {
 			session.setAttribute("err", ex.getMessage());

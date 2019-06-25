@@ -100,7 +100,7 @@ public class Accounts {
         
         try
         {
-            bd.getCmd().prepareStatement ("UPDATE [ACCOUNT] SET [USER] = ?, [PW] = ?, [HOST] = ?, [PROTOCOL] = ?, [PORT] = ?, [OWNER_ID] = ? WHERE [ID] = ?");
+            bd.getCmd().prepareStatement ("UPDATE [ACCOUNTS] SET [USER] = ?, [PW] = ?, [HOST] = ?, [PROTOCOL] = ?, [PORT] = ?, [OWNER_ID] = ? WHERE [ID] = ?");
 
             bd.getCmd().setString(1, acc.getUser());
             bd.getCmd().setString(2, acc.getPassword());

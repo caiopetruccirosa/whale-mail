@@ -42,11 +42,11 @@ public class MailOperations extends HttpServlet {
 		String subject = request.getParameter("subject");
 		
 		String[] cc = null;
-		if (!request.getParameter("cc").equals("") || request.getParameter("cc") != null)
+		if (request.getParameter("cc").trim() != "" && request.getParameter("cc") != null)
 			cc = request.getParameter("cc").split(" ");
 		
 		String[] bcc = null;
-		if (!request.getParameter("bcc").equals("") || request.getParameter("bcc") != null)
+		if (request.getParameter("bcc").trim() != "" && request.getParameter("bcc") != null)
 			bcc = request.getParameter("bcc").split(" ");
 		
 		Object message = request.getParameter("message");

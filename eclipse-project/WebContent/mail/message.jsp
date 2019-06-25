@@ -48,6 +48,7 @@ import="accountmanager.*, bd.dbos.*, javax.mail.*, java.util.*, mail.*, javax.ma
       		out.println("<div class='mail-header text-right'>");
 
       		out.println("<a href='./' class='circle waves-effect'><i class='material-icons'>arrow_back</i></a>");
+      		out.println("<a class='circle waves-effect modal-trigger' data-target='modal-move-mail'><i class='material-icons'>swap_horiz</i></a>");	
       		out.println("<a class='circle waves-effect modal-trigger' data-target='modal-delete-mail'><i class='material-icons'>delete</i></a>");	
 
       		out.println("</div>");
@@ -108,7 +109,7 @@ import="accountmanager.*, bd.dbos.*, javax.mail.*, java.util.*, mail.*, javax.ma
     	if (accounts != null && accounts.isValid() && current != null) {
     		String folder = accounts.getCurrentFolder().getName();
     		
-			// Modal de deletar e-mail
+    		// Modal de deletar e-mail
 			out.println("<div id='modal-delete-mail' class='modal'>");
 			out.println("<form method='post' action='../FolderOperations'>");
 			out.println("<div class='modal-content'>");
@@ -122,6 +123,35 @@ import="accountmanager.*, bd.dbos.*, javax.mail.*, java.util.*, mail.*, javax.ma
 			out.println("<div class='modal-footer'>");
 			out.println("<a class='modal-close waves-effect btn-flat'>Cancelar</a>");
 			out.println("<button class='modal-close waves-effect btn-flat'>Excluir</a>");
+			out.println("</div>");
+			out.println("</form>");
+			out.println("</div>");
+			
+			// Modal de mover e-mail
+			out.println("<div id='modal-move-mail' class='modal'>");
+			out.println("<form method='post' action='../FolderOperations'>");
+			out.println("<div class='modal-content'>");
+			out.println("<div class='row'>");
+			out.println("<h4>Para onde deseja mover o e-mail?</h4>");
+			out.println("</div>");
+			out.println("<div class='row'>");
+			out.println("<div class='input-field col s12'>");
+			out.println("<input id='folder_move' disabled type='text' name='folder' value='" + folder + "'>");
+			out.println("<label for='folder_move'>Pasta origem</label>");
+			out.println("</div>");
+			out.println("</div>");
+			out.println("<div class='row'>");
+			out.println("<div class='input-field col s12'>");
+			out.println("<input id='new_folder_move' type='text' name='new_folder'>");
+			out.println("<label for='new_folder_move'>Pasta destino</label>");
+			out.println("</div>");
+			out.println("</div>");
+			out.println("<input type='hidden' name='action' value='move_mail'>");
+			out.println("<input type='hidden' name='message' value='" + message + "'>");
+			out.println("</div>");
+			out.println("<div class='modal-footer'>");
+			out.println("<a class='modal-close waves-effect btn-flat'>Cancelar</a>");
+			out.println("<button class='modal-close waves-effect btn-flat'>Mover</a>");
 			out.println("</div>");
 			out.println("</form>");
 			out.println("</div>");

@@ -3,9 +3,7 @@ package handlers;
 import java.io.*;
 import java.util.*;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
+import javax.activation.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 import bd.dbos.*;
@@ -28,7 +26,7 @@ public class MailHandler {
     	props.put("mail.smtp.starttls.enable", "true");
     	props.put("mail.smtp.user", this.acc.getUser());
     	props.put("mail.smtp.password", this.acc.getPassword());
-    	props.put("mail.smtp.port", "587");
+    	props.put("mail.smtp.port", this.acc.getPort());
     	props.put("mail.smtp.auth", "true");
     	
     	Authenticator auth = new Authenticator() {
@@ -45,7 +43,7 @@ public class MailHandler {
         
         this.session = Session.getInstance(props, auth);
     }
-
+    
     public void sendEmail(Mail mail) throws Exception {
     	try {
     		Message msg = new MimeMessage(this.session);
@@ -63,7 +61,7 @@ public class MailHandler {
             String[] bcc = mail.getBCC();
             if (bcc != null)
             	for (int i = 0; i < bcc.length; i++)
-            		msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(bcc[i]));
+            		msg.addRecipients(Message.RecipientType.BCC, InternetAddress.parse(bcc[i]));
 
             msg.setSubject(mail.getSubject());
             

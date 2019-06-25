@@ -31,14 +31,12 @@
 				</div>
 				
 				<div class="row">
-					<div class="input-field col s12">
+					<div class="input-field col s6">
 						<input id="cc" type="text" name="cc">
 						<label for="cc">CC</label>
 					</div>
-				</div>
-				
-				<div class="row">
-					<div class="input-field col s12">
+					
+					<div class="input-field col s6">
 						<input id="bcc" type="text" name="bcc">
 						<label for="bcc">CCO</label>
 					</div>
