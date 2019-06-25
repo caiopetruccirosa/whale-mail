@@ -1,6 +1,6 @@
 @media only screen and (min-width: 992px) {
   .main-container {
-  	margin-left: 325px !important;
+  	margin-left: 350px !important;
   }
 }
 
@@ -13,6 +13,73 @@ body {
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
+}
+
+.text-right {
+	text-align: right;
+}
+
+.text-left {
+	text-align: left;
+}
+
+span.info-span {
+	font-size: 24px !important;
+	vertical-align: middle;
+}
+
+.folder-span {
+	margin-right: 15px;
+}
+
+.mail-container {
+    height: 640px;
+}
+
+.mail-content {
+	height: 606px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+.mail-header {
+    height: 54px;
+    padding: 8px 16px;
+    border-bottom: 1px solid lightgray;
+}
+
+.mail-header * {
+    color: gray !important;
+    font-size: 32px !important;
+}
+
+.mail-date {
+    text-align: right;
+}
+
+.no-margin {
+    margin: 0 !important;
+}
+
+.close-btn {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 56px;
+	z-index: 999;
+}
+
+.close-btn > i {
+	font-size: 32px !important;
+}
+
+.vertical-align {
+	display: table;
+}
+
+.vertical-align > * {
+	display: table-cell;
+    vertical-align: middle;
 }
 
 .main-container {
@@ -49,6 +116,19 @@ body {
 	width: 510px;
 	height: 390px;
 	overflow: hidden;
+	color: white;
+}
+
+.form-container > input {
+	color: white !important;
+}
+
+.form-container > input:focus {
+	color: white !important;
+}
+
+.data-fields {
+	padding-top: 10px;
 }
 
 .form-div {

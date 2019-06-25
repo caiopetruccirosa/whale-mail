@@ -5,6 +5,7 @@ import javax.mail.internet.*;
 import java.io.*;
 
 public class Mail implements Cloneable {
+	protected int id;
 	protected String from;
     protected String[] to;
     protected String subject;
@@ -13,8 +14,9 @@ public class Mail implements Cloneable {
     protected Date date;
     protected Object message;
     protected ArrayList<Attachment> attachments;
+    protected String folder;
 
-    public Mail(String from, String[] to, String[] cc, String[] bcc, String subject, Object message, Date date, ArrayList<Attachment> attachments) throws Exception {
+    public Mail(int id, String from, String[] to, String[] cc, String[] bcc, String subject, Object message, Date date, ArrayList<Attachment> attachments, String folder) throws Exception {
     	if (from == null || from.trim() == "")
     		throw new Exception("Remetente nulo!");
     	
@@ -26,6 +28,9 @@ public class Mail implements Cloneable {
     	
     	if (message == null)
     		throw new Exception("Mensagem nula!");
+    	
+    	if (folder == null)
+    		throw new Exception("Pasta nula!");
     	
     	this.from = from;
     	
@@ -52,11 +57,22 @@ public class Mail implements Cloneable {
     	else
     		this.bcc = null;
     	
+    	this.id = id;
     	this.subject = subject;
     	this.message = message;
     	this.date = date;
     	
-    	this.attachments = new ArrayList<Attachment>(attachments);
+    	this.attachments = attachments;
+    	
+    	this.folder = folder;
+    }
+    
+    public int getId() {
+    	return this.id;
+    }
+    
+    public String getFolder() {
+    	return this.folder;
     }
     
     public Date getDate() {
@@ -101,6 +117,7 @@ public class Mail implements Cloneable {
     public int hashCode() {
     	int ret = 3;
     	
+    	ret += new Integer(this.id).hashCode()*7;
     	ret += this.from.hashCode()*7;
     	ret += this.subject.hashCode()*7;
     	ret += this.message.hashCode()*7;
@@ -116,11 +133,13 @@ public class Mail implements Cloneable {
 	    	for (int i = 0; i < this.bcc.length; i++)
 	    		ret += this.bcc[i].hashCode()*7;
     	
+    	ret += this.folder.hashCode()*7;
+    	
     	return ret;
     }
 
     public String toString() {
-    	return "{" + this.from + ":" + this.to.toString() + ":" + this.subject + ":" + this.message + ":" + "}";
+    	return "{" + this.id + ":" + this.from + ":" + this.to.toString() + ":" + this.subject + ":" + this.message + ":" + this.folder + "}";
     }
 
     public boolean equals(Object obj) {
@@ -134,6 +153,9 @@ public class Mail implements Cloneable {
             return false;
 
         Mail m = (Mail) obj;
+        
+        if (this.id != m.id)
+        	return false;
         
         if (!this.from.equals(m.from))
         	return false;
@@ -178,6 +200,13 @@ public class Mail implements Cloneable {
         else
         	return false;
         
+        if (this.folder != null && m.folder != null) {
+        	if (!this.folder.equals(m.folder))
+        		return false;
+        }
+        else
+        	return false;
+        
         return true;
     }
 
@@ -198,6 +227,7 @@ public class Mail implements Cloneable {
     	if (m == null)
     		throw new Exception("Modelo nulo!");
     	
+    	this.id = m.id;
     	this.from = m.from;
     	
     	this.to = new String[m.to.length];
@@ -229,5 +259,7 @@ public class Mail implements Cloneable {
     	this.attachments = new ArrayList<>(m.attachments);
     	
     	this.date = (Date) m.date.clone();
+    	
+    	this.folder = m.folder;
     }
 }

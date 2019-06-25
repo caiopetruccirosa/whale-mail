@@ -14,16 +14,19 @@ public class AccountManager
     protected FolderHandler folders;
     protected MailHandler mailer;
     protected int current;
+    protected int page;
 
     public AccountManager(User user) throws Exception
     {
     	this.user = user;
     	
-        //this.accounts = Accounts.getAccounts(user.getId());
+        this.accounts = Accounts.getAccounts(user.getId());
         
     	// pra teste, porque o BD não ta funfando em casa
-    	this.accounts = new ArrayList<Account>();
-    	this.accounts.add(new Account(1, "littleheadfilms@gmail.com", "EmailLH12", "smtp.gmail.com", "IMAP", 587, 1));
+    	//this.accounts = new ArrayList<Account>();
+    	//this.accounts.add(new Account(1, "littleheadfilms@gmail.com", "EmailLH12", "smtp.gmail.com", "IMAP", 587, 1));
+    	//this.accounts.add(new Account(2, "caiorosa123@gmail.com", "SenhaForte123", "smtp.gmail.com", "IMAP", 587, 1));
+    	
     	
         if (this.accounts.size() > 0)
         	this.setCurrent(0);
@@ -31,9 +34,19 @@ public class AccountManager
         	this.setCurrent(-1);
     }
     
-    public Account getCurrentAccount() throws Exception {
-    	if (this.current < 0)
-    		throw new Exception("Usuário não possui contas!");
+    public boolean isValid() {
+    	if (this.user == null)
+    		return false;
+    	
+    	if (this.folders  == null || this.mailer == null)
+    		return false;
+    	
+    	return true;
+    }
+    
+    public Account getCurrentAccount() {
+    	if (this.current < 0 || this.current >= this.accounts.size())
+    		return null;
     	
     	return this.accounts.get(this.current);
     }
@@ -44,6 +57,10 @@ public class AccountManager
     
     public ArrayList<Account> getAccounts() {
     	return this.accounts;
+    }
+    
+    public int getPage() {
+    	return this.page;
     }
 
     public void addAccount(Account a) throws Exception
@@ -65,10 +82,11 @@ public class AccountManager
             throw new Exception("Conta nula!");
     	
     	Accounts.alterar(a);
-        this.accounts.forEach(acc -> {
-	    	if (acc.getId() == a.getId())
-	    		acc = a;
-    	});
+    	
+    	for (int i = 0; i < this.accounts.size(); i++) {
+    		if (this.accounts.get(i).getId() == a.getId())
+    			this.accounts.set(i, a);
+    	}
         
         if (this.accounts.size() > 0)
         	this.setCurrent(0);
@@ -79,10 +97,11 @@ public class AccountManager
     public void deleteAccount(int id) throws Exception
     {
         Accounts.excluir(id);
-        this.accounts.forEach(acc -> {
-	    	if (acc.getId() == id)
-	    		this.accounts.remove(acc);
-    	});
+    	
+    	for (int i = 0; i < this.accounts.size(); i++) {
+    		if (this.accounts.get(i).getId() == id)
+    			this.accounts.remove(i);
+    	}
         
         if (this.accounts.size() > 0)
         	this.setCurrent(0);
@@ -91,104 +110,122 @@ public class AccountManager
     }
     
     public void setCurrent(int c) throws Exception {
-    	if (c < -1 || c > this.accounts.size())
+    	if (c < -1 || c >= this.accounts.size())
     		throw new Exception("Conta inválida!");
     	
     	this.current = c;
+    	this.page = 0;
     	
-    	if (c > -1 && c < this.accounts.size()) {
+    	this.folders = null;
+		this.mailer = null;
+    	
+    	if (c > -1) {
     		this.folders = new FolderHandler(this.accounts.get(this.current));
         	this.mailer = new MailHandler(this.accounts.get(this.current));
-    	} else {
-    		this.folders = null;
-    		this.mailer = null;
     	}
     }
     
-    public Mail[][] getCurrentMessages() throws Exception {
-    	if (this.current < 0)
-    		throw new Exception("Não foi possível listar as mensagens do e-mail atual!");
-    	
-    	Mail[][] ret = new Mail[this.accounts.size()][];
-    	
-    	Mail[] aux = null;
-    	if (this.current == this.accounts.size()) {
-    		for (int i = 0; i < ret.length; i++) {
-        		this.folders = new FolderHandler(this.accounts.get(i));
-        		aux = this.folders.getCurrentMails();
-        		ret[i] = new Mail[aux.length];
-        		ret[i] = aux;
-        	}
-    		
-    		this.folders = null;
-    		this.mailer = null;
-    	} else {
-    		aux = this.folders.getCurrentMails();
-    		ret[0] = new Mail[aux.length];
-    		ret[0] = aux;
-    	}
-    	
-    	return ret;
+    public void nextPage() {
+    	if (this.page < 99)
+    		this.page++;
+    	else
+    		this.page = 99;
     }
     
-    public Folder[][] getCurrentFolders() throws Exception {
-    	if (this.current < 0)
-    		throw new Exception("Não foi possível listar as pastas do e-mail atual!");
+    public void previousPage() {
+    	if (this.page > 0)
+    		this.page--;
+    	else
+    		this.page = 0;
+    }
+    
+    public void setCurrentFolder(String c) throws Exception {
+    	if (c == null || c.trim() == "")
+    		throw new Exception("Pasta inválida!");
     	
-    	Folder[][] ret = new Folder[this.accounts.size()][];
+    	if (this.folders == null)
+    		throw new Exception("Selecione uma conta!");
     	
-    	Folder[] aux = null;
-    	if (this.current == this.accounts.size()) {
-    		for (int i = 0; i < ret.length; i++) {
-        		this.folders = new FolderHandler(this.accounts.get(i));
-        		
-        		aux = this.folders.getCurrentFolders();
-        		ret[i] = new Folder[aux.length];
-        		ret[i] = aux;
-        	}
-    		
-    		this.folders = null;
-    		this.mailer = null;
-    	} else {
-    		aux = this.folders.getCurrentFolders();
-    		ret[0] = new Folder[aux.length];
-    		ret[0] = aux;
-    	}
+    	this.folders.setCurrent(c);
+    }
+    
+    public Mail[] getCurrentMails() throws Exception {
+    	if (this.current < 0 || this.folders == null)
+    		throw new Exception("Selecione uma conta!");
     	
-    	return ret;
+    	return this.folders.getCurrentMails(this.page);
+    }
+    
+    public Folder getCurrentFolder() throws Exception {
+    	if (this.folders == null)
+    		return null;
+    	
+    	return this.folders.getCurrent();
+    }
+    
+    public Folder[] getCurrentFolders() throws Exception {
+    	if (this.current < 0 || this.folders == null)
+    		throw new Exception("Selecione uma conta!");
+    	
+    	return this.folders.getFolders();
     }
         
-    public void deleteFolder(String folderName) throws Exception {
-    	if (folderName == null)
+    public void deleteFolder(String folder) throws Exception {
+    	if (folder == null || folder.trim() == "")
     		throw new Exception("Nome de pasta inválido!");
     	
-    	if (this.folders != null)
-    		this.folders.deleteFolder(folderName);
+    	if (this.folders == null)
+    		throw new Exception("Selecione uma conta!");
+    	
+    	this.folders.deleteFolder(folder);
     }
     
     public void renameFolder(String name, String newName) throws Exception {
-    	if (name == null)
+    	if (name == null || name.trim() == "")
     		throw new Exception("Nome de pasta inválido!");
     	
-    	if (newName == null)
+    	if (newName == null || newName.trim() == "")
     		throw new Exception("Novo nome de pasta inválido!");
     	
-    	if (this.folders != null)
-    		this.folders.renameFolder(name, newName);
+    	if (this.folders == null)
+    		throw new Exception("Selecione uma conta!");
+    	
+    	this.folders.renameFolder(name, newName);
     }
     
-    public void createFolder(String folderName) throws Exception {
-    	if (folderName == null)
+    public void createFolder(String folder) throws Exception {
+    	if (folder == null || folder.trim() == "")
     		throw new Exception("Nome de pasta inválido!");
     	
-    	if (this.folders != null)
-    		this.folders.createFolder(folderName);
+    	if (this.folders == null)
+    		throw new Exception("Selecione uma conta!");
+    	
+    	this.folders.createFolder(folder);
     }
     
-    public void moveFolder() throws Exception {}
-    
-    public void moveMail() throws Exception {}
-    
-    public void deleteMail() throws Exception {}
+    public void deleteMail(String folder, int message) throws Exception {
+    	if (folder == null)
+    		throw new Exception("Nome de pasta inválido!");
+    	
+    	if (message < 0)
+    		throw new Exception("Mensagem inválida!");
+    	
+    	if (this.folders == null)
+    		throw new Exception("Selecione uma conta!");
+    	
+    	this.folders.deleteMail(folder, message);
+    }
 
+    public Mail getMail(String folder, int message) throws Exception {
+    	if (folder == null || folder.trim() == "")
+    		throw new Exception("Pasta inválida");
+    	
+    	if (message < 1)
+    		throw new Exception("Mensagem inválida!");
+
+    	if (this.folders == null)
+    		throw new Exception("Selecione uma conta!");
+    	
+    	return this.folders.getMail(folder, message);
+    }
 }

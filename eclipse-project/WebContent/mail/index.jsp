@@ -1,310 +1,124 @@
-  <%@ page contentType="text/html;charset=UTF-8" 
-language="java" 
-import="accountmanager.*, bd.dbos.*, javax.mail.*, java.util.*, mail.*" %>
+<%@ page contentType="text/html;charset=UTF-8" 
+	language="java" 
+	import="accountmanager.*, bd.dbos.*, javax.mail.*, java.util.*, mail.*" %>
 
-<%
-AccountManager acc = (AccountManager)session.getAttribute("user");
-  if (acc == null)
-      response.sendRedirect("../");
-%>
+<%@include file="../includes/loggedin.jsp" %>
 
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-
-    <title>WhaleMail</title>
-
-    <link rel="stylesheet" type="text/css" href="../css/animate.css">
-    <link rel="stylesheet" type="text/css" href="../css/fonts.css">
-    <link rel="stylesheet" type="text/css" href="../css/fontawesome.css">
-    <link rel="stylesheet" type="text/css" href="../css/materialize.css">
-    <link rel="stylesheet" type="text/css" href="../css/style.css">
-  </head>
+	<head>
+		<title>WhaleMail</title>
+	
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		
+		<link rel="stylesheet" type="text/css" href="../css/animate.css">
+		<link rel="stylesheet" type="text/css" href="../css/fontawesome.css">
+		<link rel="stylesheet" type="text/css" href="../css/fonts.css">
+		<link rel="stylesheet" type="text/css" href="../css/materialize.css">
+		<link rel="stylesheet" type="text/css" href="../css/style.css">
+	</head>
 
   <body>
-    <nav>
-      <div class="nav-wrapper">
-        <a href="#" class="brand-logo right">WhaleMail</a>
-
-        <a href="#" data-target="slide-out" class="sidenav-trigger">
-          <i class="material-icons">menu</i>
-        </a>
-      </div>
-    </nav>
-
-    <ul id="slide-out" class="sidenav sidenav-fixed">
-      <li>
-        <div class="user-view user-header">
-          <h4 class="white-text center">
-          	<% 
-				try {
-					out.println(acc.getUser().getUser()); 
-				}
-				catch(Exception ex) {
-					out.println(ex.getMessage());
-				}
-			%>
-          </h4>
-        </div>
-      </li>
-
-      <li>
-        <a class="subheader"><i class="material-icons">account_circle</i> Conta atual</a>
-      </li>
-
-      <li>
-        <a class="waves-effect" href="#!">
-	        <% 
-				try {
-					out.println(acc.getCurrentAccount().getUser()); 
-				}
-				catch(Exception ex) {
-					out.println(ex.getMessage());
-				}
-			%>
-        </a>
-      </li>
-
-      <li>
-        <div class="divider"></div>
-      </li>
-
-      <li>
-        <a class="subheader"><i class="material-icons">group</i> Contas</a>
-      </li>
-
-		<li>
-			<a class="waves-effect" href="#"> Todas as contas </a>
-		</li>
-		<li>
+	<%@include file="../includes/sidenav.jsp" %>
+	<%@include file="../includes/modals.jsp" %>
+	
+	<%
+		AccountManager accounts = (AccountManager)session.getAttribute("user");
+	
+		User user = null;
+		if (accounts != null)
+			user = accounts.getUser();
 		
-		<div class="input-field">
-    <
->
-      <% 
-				try {
-					for(Account ac : acc.getAccounts()) {
-						out.println("<option class='waves-effect' href='#'>");
-						out.println(ac.getUser());
-						out.println("</option>");
-					}
-				}
-				catch(Exception ex) {
-					out.println("<option>");
-					out.println("<a class='waves-effect' href='#'>" + ex.getMessage() + "</a>");
-					out.println("</option>");
-				}
-			%>
-    </select>
-    <label>Materialize Select</label>
-  </div>
-		
-	  </li>
-      <li>
-        <div class="divider"></div>
-      </li>
+		Account current = null;
+		if (accounts != null)
+			current = accounts.getCurrentAccount();
+	%>
 
-      <li>
-        <a class="subheader"><i class="material-icons">folder</i> Pastas</a>
-      </li>
-       <form action="get" method="/FolderOperations"> 
+	<div class="main-container">
+      <div class="mail-container card">
 		<%
-			try {
-				Folder[][] folders = acc.getCurrentFolders();
-				
-				for (int i = 0; i < folders.length; i++) {
-					for (int j = 0; j < folders[i].length; j++) {
-						out.println("<li>");
-						out.println("<a class='waves-effect' href='#'>" + folders[i][j].getName() + "</a>");
-						out.println("</li>");
-					}
-				}
-			} catch (Exception ex) {
-				out.println("<li>");
-				out.println("<a class='waves-effect' href='#'>" + ex.getMessage() + "</a>");
-				out.println("</li>");
-			}
+		  if (accounts != null && accounts.isValid()) {
+		    out.println("<div class='mail-header text-right'>");
+		    
+		    out.println("<span class='info-span folder-span'>Pasta: " + accounts.getCurrentFolder().getName() + "</span>");
+		    out.println("<span class='info-span'>Page: " + (accounts.getPage() + 1) + "</span>");
+		    out.println("<a href='../FolderOperations?action=go_backwards' class='circle waves-effect'><i class='material-icons'>arrow_back</i></a>");
+		    out.println("<a href='../FolderOperations?action=go_forward' class='circle waves-effect'><i class='material-icons'>arrow_forward</i></a>");
+		    
+		    if (!accounts.getCurrentFolder().getName().equals("INBOX")) {
+		    	out.println("<a class='circle waves-effect modal-trigger' data-target='modal-rename-folder'><i class='material-icons'>settings</i></a>");
+		    	out.println("<a class='circle waves-effect modal-trigger' data-target='modal-delete-folder'><i class='material-icons'>delete</i></a>");	
+		    }
+		    
+		    out.println("</div>");
+		
+		    Mail[] messages = accounts.getCurrentMails();
+		
+		    out.println("<div class='mail-content'>");
+		
+		    if (messages != null) {
+		    	out.println("<ul class='collection no-margin'>");
+		    	
+		    	for (int i = messages.length-1; i >= 0; i--) {
+			      Mail aux = messages[i];
+			
+			      out.println("<li class='collection-item avatar mail-collection-item'>");
+			      out.println("<span class='title text-bold'>" + aux.getFrom() + "</span>");
+			      out.println("<p>");
+			      out.println(aux.getSubject());
+			      out.println("</p>");
+			      out.println("<a href='message.jsp?message=" + aux.getId() + "' class='secondary-content'>");
+			      out.println("<i class='material-icons'>arrow_forward</i>");
+			      out.println("</a>");
+			      out.println("</li>");
+			    }
+		    	
+		    	out.println("</ul>");
+		    } else {
+		    	out.println("<br/><br/><center><h4>Não há nenhum e-mail nesta pasta!</h4></center>");
+		    }
+		
+		    out.println("</div>");
+		  } else {
+			out.println("<br/><br/><center><h4>Há algum problema com sua conta!</h4></center>");
+		  }
 		%>
-	  </form>
-      <li>
-        <div class="divider"></div>
-      </li>
-
-      <li>
-        <a class="waves-effect" href="../Logout"><i class="material-icons">exit_to_app</i> Sair</a>
-      </li>
-    </ul>
-
-    <div class="main-container">
-      <div class="mails-container">
-        <ul class="collection" id="slide-out">
-      	<%
-      		try{
-      			Mail[][] mails = acc.getCurrentMessages();
-	      			for(int i =0; i<mails.length ;i++) {
-	      				if (mails[i].length<20){
-	      				for(int j=0;j<mails[i].length;j++) {
-	      					out.println("");
-          					out.println("<li class='collection-item avatar mail-collection-item'>");
-          					out.println("<span class='title'>" + mails[i][j].getFrom()+ "</span>");
-          					out.println("<p>");
-          					out.println(mails[i][j].getSubject());
-          		            out.println("<br>");
-          		        	//out.println("Second Line");
-          		        	out.println("</p>");
-          		        	out.println("<a href='#!' class='secondary-content'>");
-          		        	out.println("<i class='material-icons'>arrow_forward</i>");
-          		        	out.println("</a>");
-          		        	out.println("</li>");
-	      				}
-	      			} else { 
-	      				for(int j=0;j<20;j++) {
-      					out.println("");
-      					out.println("<li class='collection-item avatar mail-collection-item'>");
-      					out.println("<span class='title'>" + mails[i][j].getFrom()+ "</span>");
-      					out.println("<p>");
-      					out.println(mails[i][j].getSubject());
-      		            out.println("<br>");
-      		        	//out.println("Second Line");
-      		        	out.println("</p>");
-      		        	out.println("<a href='#!' class='secondary-content'>");
-      		        	out.println("<i class='material-icons'>arrow_forward</i>");
-      		        	out.println("</a>");
-      		        	out.println("</li>");
-	      				}
-      				}
-      			}
-      		}catch(Exception ex)
-      		{
-      			out.println(ex.getMessage());
-      		}
-      	%>
-          
-            
-         
-        </ul>
       </div>
-	
-      <div class="fixed-action-btn">
-        <a class="btn-floating btn-large waves-effect waves-light red modal-trigger" onclick="$('#email_modal').modal('open')"><i class="material-icons">border_color</i></a>
-      </div>
-	
-	<!-- Modal Structure -->
-	  <div id="email_modal" class="modal modal-fixed-footer">
-	  		<div class="modal-header">
-	  			 <h3>Escrever mensagem</h3>
-	  			 <i class="material-icons prefix center icon-responsive modal-close" style="margin-right: 10px">close</i>
-	  		</div>
-		  <form method="post" action="MailOperations">
-		    <div class="modal-content">
-		      
-						<div class="input-field">
-							<i class="material-icons prefix center icon-responsive modal-close">person</i>
-							<input id="to" type="text" name="to">
-							<label for="to">Destinatário...</label>
-						</div>
-	
-						<div class="input-field">
-							<i class="material-icons prefix center icon-responsive">chat_bubble</i>
-							<input id="subject" type="text" name="Subject">
-							<label for="subject">Assunto...</label>
-						</div>
-						
-						<div class="input-field">
-							<i class="material-icons prefix center icon-responsive">person_add</i>
-							<input id="cc" type="text" name="cc">
-							<label for="cc">CC</label>
-						</div>
-						
-						<div class="input-field">
-							<i class="material-icons prefix center icon-responsive">person_outline</i>
-							<input id="cco" type="text" name="cco">
-							<label for="cco">CCO</label>
-						</div>
-						
-						<div class="input-field col s12">
-						<i class="material-icons prefix center icon-responsive">edit</i>
-	          				<textarea id="message_area" class="materialize-textarea" name="message_area"></textarea>
-	          				<label for="message_area">Escrevas sua mensagem...</label>
-        				</div>
-						
-        				 <div class="file-field input-field">
-					      <div class="file-path-wrapper">
-					        <i class="material-icons prefix center icon-responsive"><input type="file" multiple>attach_file</i>
-					        <input  id='attachments' name='attachments' class="file-path validate" type="text" placeholder="Upload one or more files" type="text">
-					      </div>
-					    </div>		
-		     </div>
-		     <div class="modal-footer">
-		     	
-		       <a class="modal-close  waves-effect waves-light"><input type="submit">Enviar</a>
-		     </div>
-		    </form>
-		    
-		  </div>
-		  
-		<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-		 
-	<div id="adicionar_conta_modal" class="modal modal-fixed-footer">
-	  		<div class="modal-header">
-	  			 <h3>Adicionar Conta:</h3>
-	  			 <i class="material-icons prefix center icon-responsive modal-close" style="margin-right: 10px">close</i>
-	  		</div>
-		  <form method="get" action="AAAAAAAAAAAAAAAAAAAAA">
-		    <div class="modal-content">
-		      
-						<div class="input-field">
-							<i class="material-icons prefix center icon-responsive modal-close">person</i>
-							<input id="emailaddress" type="text" name="emailaddress">
-							<label for="emailaddress">Endereço de E-mail...</label>
-						</div>
-	
-						<div class="input-field">
-							<i class="material-icons prefix center icon-responsive">lock</i>
-							<input id="pwd" type="text" name="pwd">
-							<label for="pwd">Senha do E-mail...</label>
-						</div>
-						
-						<div class="input-field">
-							<i class="material-icons prefix center icon-responsive">person_add</i>
-							<input id="host" type="text" name="host">
-							<label for="host">Host do E-mail...</label>
-						</div>
-						
-						<div class="input-field">
-							<i class="material-icons prefix center icon-responsive">person_outline</i>
-							<input id="cco" type="text" name="cco">
-							<label for="cco">CCO</label>
-						</div>
-						
-										
-        				 <div class="file-field input-field">
-					      <div class="file-path-wrapper">
-					        <i class="material-icons prefix center icon-responsive"><input type="file" multiple>attach_file</i>
-					        <input  id='attachments' name='attachments' class="file-path validate" type="text" placeholder="Upload one or more files" type="text">
-					      </div>
-					    </div>		
-		     </div>
-		     <div class="modal-footer">
-		     	
-		       <a class="modal-close  waves-effect waves-light"><input type="submit">Enviar</a>
-		     </div>
-		    </form>
-		    
-		  </div>
-	
     </div>
-    <script type="text/javascript" src="../js/jquery.js"></script>
-    <script type="text/javascript" src="../js/materialize.js"></script>
-    <script type="text/javascript" src="../js/script.js"></script>
 
-    <script type="text/javascript">
-    $(document).ready(function(){
-      $('.sidenav').sidenav();
-      $('.modal').modal();
-      $('select').formSelect();
-    });
-    </script>
+	<%
+		if (accounts != null && accounts.isValid() && current != null) {
+			out.println("<div class='fixed-action-btn'>");
+			out.println("<a class='btn-floating btn-large waves-effect waves-light red modal-trigger' data-target='modal-email'><i class='material-icons'>border_color</i></a>");
+			out.println("</div>");
+		}
+	%>
+    
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/materialize.js"></script>
+	<script type="text/javascript" src="../js/script.js"></script>
+	
+	<script type="text/javascript">	
+		$('.sidenav').sidenav();
+		
+		$('.modal').modal();
+		
+		$('.dropdown-trigger').dropdown();
+		 
+		<%
+			String err = (String)session.getAttribute("err");
+			String success = (String)session.getAttribute("success");
+			
+			session.removeAttribute("err");
+			session.removeAttribute("success");
+			
+			if (err != null)
+				out.println("M.toast({html: '" + err + "'})");
+			
+			
+			if (success != null)
+				out.println("M.toast({html: '" + success + "'})");
+		%>
+	</script>
   </body>
 </html>

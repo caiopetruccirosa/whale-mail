@@ -2,8 +2,6 @@ package handlers;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import bd.dbos.*;
 import mail.*;
@@ -16,6 +14,7 @@ public class FolderHandler
     protected Session session;
     protected Store store;
     protected String current;
+    protected final int PAGE_LIMIT;
 
     public FolderHandler(Account acc) throws Exception
     {
@@ -23,6 +22,8 @@ public class FolderHandler
             throw new Exception("Conta nula!");
 
         this.acc = acc;
+        
+        this.PAGE_LIMIT = 10;
         
         Properties prop = new Properties();        
         prop.put("mail.imap.host", "imap.gmail.com");
@@ -33,12 +34,18 @@ public class FolderHandler
         this.store = this.session.getStore("imaps");
         this.store.connect("imap.gmail.com", acc.getUser(), acc.getPassword());
         
-        this.current = "";
+        this.current = "INBOX";
     }
 
-    public void renameFolder(String name, String newName)  throws Exception
+    public void renameFolder(String foldername, String newName)  throws Exception
     {
-        Folder folder = this.store.getFolder(name);
+    	if (foldername == null || foldername.trim() == "")
+    		throw new Exception("Pasta inválido!");
+    	
+    	if (newName == null || newName.trim() == "")
+    		throw new Exception("Novo nome de pasta inválido!");
+    	
+        Folder folder = this.store.getFolder(foldername);
 
         if (!folder.exists())
         	throw new Exception("Pasta não encontrada!");
@@ -49,8 +56,11 @@ public class FolderHandler
         folder.renameTo(this.store.getFolder(newName));
     }
 
-    public boolean createFolder(String name)  throws Exception {
-        Folder folder = this.store.getFolder(name);
+    public boolean createFolder(String foldername)  throws Exception {
+    	if (foldername == null || foldername.trim() == "")
+    		throw new Exception("Nome de pasta inválido!");
+    	
+        Folder folder = this.store.getFolder(foldername);
 
         if (!folder.exists()) {
         	if (folder.create(Folder.HOLDS_MESSAGES))
@@ -61,8 +71,11 @@ public class FolderHandler
         return false;
     }
 
-    public boolean deleteFolder(String name) throws Exception {
-        Folder folder = this.store.getFolder(name);
+    public boolean deleteFolder(String foldername) throws Exception {
+    	if (foldername == null || foldername.trim() == "")
+    		throw new Exception("Nome de pasta inválido!");
+    	
+        Folder folder = this.store.getFolder(foldername);
 
         if (!folder.exists())
             throw new Exception("Pasta não encontrada!");
@@ -82,33 +95,47 @@ public class FolderHandler
     	
     	this.current = c;
     }
-
-    public Folder[] getCurrentFolders() throws Exception
-    {
-        return this.store.getFolder(this.current).list("*");
+    
+    public Folder getCurrent() throws Exception {
+    	return this.store.getFolder(this.current);
     }
 
-    public Mail[] getCurrentMails() throws Exception
+    public Folder[] getFolders() throws Exception
     {
-    	return this.getMails(this.current);
+        return this.store.getDefaultFolder().list("*");
+    }
+
+    public Mail[] getCurrentMails(int page) throws Exception
+    {
+    	return this.getMails(this.current, page);
     }
     
-    public Mail[] getMails(String folderName) throws Exception
+    public Mail[] getMails(String foldername, int page) throws Exception
     {
-    	if (folderName.equals(""))
-    		folderName = "INBOX";
+    	if (foldername == null || foldername.trim() == "")
+    		throw new Exception("Pasta inválido!");
     	
-    	Folder folder = this.store.getFolder(folderName);
+    	Folder folder = this.store.getFolder(foldername);
+    	
+    	if (!folder.exists())
+    		throw new Exception("Pasta não encontrada!");
+    	
     	folder.open(Folder.READ_ONLY);
 
-        Message[] messages = folder.getMessages(1, 20);
+    	int limit = folder.getMessageCount();
+    	int max = limit - (page * this.PAGE_LIMIT);
+    	int min = max - this.PAGE_LIMIT;
+    	
+    	if (limit < 1 || max < 1)
+    		return null;
+    	
+    	if (min < 1)
+    		min = 1;
+    	
+        Message[] messages = folder.getMessages(min, max);
         Mail[] mails = new Mail[messages.length];
         
-        int limit = messages.length;
-        if (limit > 50)
-        	limit = 50;
-        
-        for (int i = 0; i < limit; i++) {
+        for (int i = 0; i < messages.length; i++) {
         	InternetAddress addressFrom = (InternetAddress) messages[i].getFrom()[0];
         	String from = addressFrom.getPersonal();
         	
@@ -117,9 +144,10 @@ public class FolderHandler
         	String[] to = new String[1];
         	to[0] = this.acc.getUser();
         	String subject = messages[i].getSubject();
+        	int id = messages[i].getMessageNumber();
         	
         	
-        	Mail aux = new Mail(from, to, null, null, subject, msg, date, null);
+        	Mail aux = new Mail(id, from, to, null, null, subject, msg, date, null, foldername);
         	
         	mails[i] = aux;
         }
@@ -127,9 +155,46 @@ public class FolderHandler
         return mails;
     }
     
-    public void moveMail() throws Exception {}
+    public void deleteMail(String foldername, int message) throws Exception {
+    	if (foldername == null || foldername.trim() == "")
+    		throw new Exception("Nome de pasta inválido!");
+    	
+    	if (message < 0)
+    		throw new Exception("Mensagem inválida!");
+    	
+    	Folder folder = this.store.getFolder(foldername);
+    	folder.open(Folder.READ_WRITE);
+    	
+    	Message msg = folder.getMessage(message);
+    	msg.setFlag(Flags.Flag.DELETED, true);
+    }
     
-    public void deleteMail() throws Exception {}
-    
-    public void moveFolder(String origin, String dest) throws Exception {}
+    public Mail getMail(String foldername, int message) throws Exception {
+    	if (foldername == null || foldername.trim() == "")
+    		throw new Exception("Pasta inválida");
+    	
+    	if (message < 1)
+    		throw new Exception("Mensagem inválida!");
+    	
+    	Folder folder = this.store.getFolder(foldername);
+    	
+    	if (!folder.exists())
+    		throw new Exception("Pasta não encontrada!");
+    	
+    	folder.open(Folder.READ_ONLY);
+    	
+        Message msgObj = folder.getMessage(message);
+        
+        InternetAddress addressFrom = (InternetAddress) msgObj.getFrom()[0];
+    	String from = addressFrom.getPersonal();
+    	
+    	Object msg = msgObj.getContent();
+    	Date date = msgObj.getSentDate();
+    	String[] to = new String[1];
+    	to[0] = this.acc.getUser();
+    	String subject = msgObj.getSubject();
+    	int id = msgObj.getMessageNumber();
+    	
+    	return new Mail(id, from, to, null, null, subject, msg, date, null, foldername);
+    }
 }

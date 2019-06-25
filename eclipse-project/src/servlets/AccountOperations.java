@@ -29,6 +29,20 @@ public class AccountOperations extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();	
+		AccountManager acc = (AccountManager) session.getAttribute("user");
+		
+		int current = -1;
+		if (request.getParameter("current") != null)
+			current = Integer.parseInt(request.getParameter("current"));
+		
+		try {
+			acc.setCurrent(current);
+		} catch (Exception ex) {
+			session.setAttribute("err", ex.getMessage());
+		}
+		
+		session.setAttribute("user", acc);
 		response.sendRedirect("/whalemail/mail/");
 	}
 
@@ -41,15 +55,24 @@ public class AccountOperations extends HttpServlet {
 		HttpSession session = request.getSession();	
 		AccountManager acc = (AccountManager) session.getAttribute("user");
 		
-		try {
-			int id = Integer.parseInt(request.getParameter("id"));
-			String user = request.getParameter("user");
-		    String pass = request.getParameter("pass");
-		    String host = request.getParameter("host");
-		    String protocol = request.getParameter("protocol");
-		    int port = Integer.parseInt(request.getParameter("port"));
-		    int owner_id = Integer.parseInt(request.getParameter("owner_id"));
-			
+		int id = -1;
+		if (request.getParameter("id") != null)
+			id = Integer.parseInt(request.getParameter("id"));
+		
+		String user = request.getParameter("user");
+	    String pass = request.getParameter("pass");
+	    String host = request.getParameter("host");
+	    String protocol = request.getParameter("protocol");
+	    
+	    int port = -1;
+		if (request.getParameter("port") != null)
+			port = Integer.parseInt(request.getParameter("port"));
+	    
+	    int owner_id = -1;
+		if (request.getParameter("owner_id") != null)
+			owner_id = Integer.parseInt(request.getParameter("owner_id"));
+		
+		try {			
 		    if (action.equals("add")) {
 		    	Account newAcc = new Account(id, user, pass, host, protocol, port, owner_id);
 		    	acc.addAccount(newAcc);
@@ -70,7 +93,7 @@ public class AccountOperations extends HttpServlet {
 		}
 		
 		session.setAttribute("user", acc);	
-		response.sendRedirect("/whalemail/");
+		response.sendRedirect("/whalemail/mail/");
 	}
 
 }

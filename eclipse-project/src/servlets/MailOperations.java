@@ -64,7 +64,7 @@ public class MailOperations extends HttpServlet {
 			Attachment at = new Attachment(fds, fds.getName(), null);
 			at_array.add(at);
 		}
-			Mail mail = new Mail(from, to, cc, cco, subject, message, sentDate, at_array);
+			Mail mail = new Mail(0, from, to, cc, cco, subject, message, sentDate, at_array, "INBOX");
 			MailHandler handler = new MailHandler(acc.getCurrentAccount());
 			handler.sendEmail(mail, "text/html");
 		}

@@ -28,23 +28,24 @@ public class Authentication extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
+		HttpSession session = request.getSession();
+		
 		String user = request.getParameter("userlogin").trim();
 		String pass = request.getParameter("passlogin").trim();
 		
-		HttpSession session = request.getSession();	
 		try {
+			/*
 			session.setAttribute("user", new AccountManager(new User(1, user, pass)));				
 			response.sendRedirect("/whalemail/mail/");
+			*/
 			
-			/*
 			if (Users.existe(user, pass)) {
 				session.setAttribute("user", new AccountManager(Users.getUser(user)));				
 				response.sendRedirect("/whalemail/mail/");
 			} else {
 				throw new Exception("Usuário ou senha estão incorretos!");
 			}
-			*/
 		}
 		catch (Exception ex) {
 			session.setAttribute("err", ex.getMessage());
@@ -55,12 +56,13 @@ public class Authentication extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
+		HttpSession session = request.getSession();
+		
 		String user = request.getParameter("usercadastro").trim();
 		String pass = request.getParameter("passcadastro").trim();
 		String passconf = request.getParameter("passconfcadastro").trim();
 		
-		HttpSession session = request.getSession();
 		try {
 			if (!pass.equals(passconf))
 				throw new Exception("Senhas diferentes!");
