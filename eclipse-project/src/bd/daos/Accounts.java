@@ -40,7 +40,7 @@ public class Accounts {
         
         try
         {
-            bd.getCmd().prepareStatement("INSERT INTO [ACCOUNT]([USER], [PW], [HOST], [PROTOCOL], [PORT], [OWNER_ID]) VALUES (?, ?, ?, ?, ?, ?)");
+            bd.getCmd().prepareStatement("INSERT INTO [ACCOUNTS]([USER], [PW], [HOST], [PROTOCOL], [PORT], [OWNER_ID]) VALUES (?, ?, ?, ?, ?, ?)");
 
             bd.getCmd().setString(1, acc.getUser());
             bd.getCmd().setString(2, acc.getPassword());

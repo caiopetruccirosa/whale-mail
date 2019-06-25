@@ -70,40 +70,42 @@
 	<li><a class='waves-effect modal-trigger' data-target='modal-add-account'>Adicionar conta <i class='material-icons'>person_add</i></a></a></li>
 
 	<%
-		if (accountsSidenav != null && accountsSidenav.isValid() && currentSidenav != null) {
+		if (currentSidenav != null) {
 			out.println("<li><a class='waves-effect modal-trigger' data-target='modal-update-account'>Alterar conta atual <i class='material-icons'>edit</i></a></li>");
 			out.println("<li><a class='waves-effect modal-trigger' data-target='modal-delete-account'>Excluir conta atual <i class='material-icons'>backspace</i></a></li>");
 
-			out.println("<li><div class='divider'></div></li>");
-			out.println("<li><a class='subheader'><i class='material-icons'>folder</i> Pastas</a></li>");
-			
-			out.println("<li><a class='modal-trigger waves-effect' data-target='modal-create-folder'>Criar nova pasta <i class='material-icons'>create_new_folder</i></a></li>");
-			
-			try {
-				Folder[] folders = accountsSidenav.getCurrentFolders();
+			if (accountsSidenav != null && accountsSidenav.isValid()) {
+				out.println("<li><div class='divider'></div></li>");
+				out.println("<li><a class='subheader'><i class='material-icons'>folder</i> Pastas</a></li>");
 				
-				for (int i = 0; i < folders.length; i++) {
-					try {
-						folders[i].open(Folder.READ_ONLY);
-						
-						if (folders[i].getMode() == Folder.HOLDS_MESSAGES) {
-							String foldername = folders[i].getName();
+				out.println("<li><a class='modal-trigger waves-effect' data-target='modal-create-folder'>Criar nova pasta <i class='material-icons'>create_new_folder</i></a></li>");
+				
+				try {
+					Folder[] folders = accountsSidenav.getCurrentFolders();
+					
+					for (int i = 0; i < folders.length; i++) {
+						try {
+							folders[i].open(Folder.READ_ONLY);
 							
-							out.println("<li>");
-							out.println("<a class='waves-effect' href='../FolderOperations?action=change_folder&folder=" + foldername + "'>" + foldername + "</a>");
-							out.println("</li>");	
+							if (folders[i].getMode() == Folder.HOLDS_MESSAGES) {
+								String foldername = folders[i].getName();
+								
+								out.println("<li>");
+								out.println("<a class='waves-effect' href='../FolderOperations?action=change_folder&folder=" + foldername + "'>" + foldername + "</a>");
+								out.println("</li>");	
+							}
+						}
+						catch(Exception ex) {
+							if (!ex.getMessage().equals("folder cannot contain messages"))
+								throw ex;
 						}
 					}
-					catch(Exception ex) {
-						if (!ex.getMessage().equals("folder cannot contain messages"))
-							throw ex;
-					}
-				}
-			} catch (Exception ex) {
-				if (ex.getMessage() != null)
-					out.println("<li><a class='subheader'>" + ex.getMessage() + "</a></li>");
-				else
-					out.println("<li><a class='subheader'>Ocorreu algum erro!</a></li>");	
+				} catch (Exception ex) {
+					if (ex.getMessage() != null)
+						out.println("<li><a class='subheader'>" + ex.getMessage() + "</a></li>");
+					else
+						out.println("<li><a class='subheader'>Ocorreu algum erro!</a></li>");	
+				}	
 			}
 		}
 	%>
